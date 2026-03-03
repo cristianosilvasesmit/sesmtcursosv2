@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import Cursos from './pages/Cursos'
 import Sesmt from './pages/Sesmt'
 import Contato from './pages/Contato'
+import Login from './pages/Login'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/cursos" element={<Cursos />} />
           <Route path="/sesmt" element={<Sesmt />} />
           <Route path="/contato" element={<Contato />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
 
         <Footer />

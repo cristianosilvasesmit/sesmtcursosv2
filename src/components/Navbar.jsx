@@ -23,7 +23,7 @@ function Navbar() {
             </nav>
 
             <div className="auth" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <button style={{ background: 'transparent', color: 'white', fontWeight: 700, fontSize: '0.85rem' }}>LOGIN</button>
+                <Link to="/login" style={{ background: 'transparent', color: 'white', fontWeight: 700, fontSize: '0.85rem' }}>LOGIN</Link>
                 <button style={{ background: '#22c55e', color: 'white', padding: '0.6rem 1.5rem', borderRadius: '4px', fontWeight: 900, fontSize: '0.85rem' }}>CADASTRE-SE</button>
 
                 {/* Botão Mobile */}
