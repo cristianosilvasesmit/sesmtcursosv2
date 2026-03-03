@@ -36,7 +36,9 @@ function Cursos() {
                                 </div>
                                 <div style={{ padding: '2rem' }}>
                                     <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'white' }}>{item.title}</h3>
-                                    <button style={{ width: '100%', padding: '0.8rem', background: 'transparent', border: '1px solid var(--industrial-border)', color: 'white', fontWeight: 900, borderRadius: '4px', fontSize: '0.7rem' }}>VER CONTEÚDO PROGRAMÁTICO</button>
+                                    <a href={`https://wa.me/5511999999999?text=Olá! Gostaria de mais informações sobre o treinamento de ${item.title}.`} target="_blank" rel="noopener noreferrer" style={{ width: '100%', padding: '0.8rem', background: 'transparent', border: '1px solid var(--industrial-border)', color: 'white', fontWeight: 900, borderRadius: '4px', fontSize: '0.7rem', display: 'block', textAlign: 'center', transition: 'all 0.3s' }}>
+                                        SOLICITAR INFORMAÇÕES
+                                    </a>
                                 </div>
                             </div>
                         ))}
