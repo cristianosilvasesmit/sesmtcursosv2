@@ -25,8 +25,14 @@ export const AuthProvider = ({ children }) => {
         });
 
         // 2. Ouvir mudanças (login/logout)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             setUser(mapSessionUser(session?.user));
+
+            // Se for recuperação de senha, podemos marcar um estado ou apenas garantir o loading false
+            if (event === 'PASSWORD_RECOVERY') {
+                console.log("Recuperação de senha detectada!");
+            }
+
             setLoading(false);
         });
 
@@ -35,7 +41,12 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+            if (error.message.includes("Email not confirmed")) {
+                throw new Error("Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada!");
+            }
+            throw error;
+        }
         return data;
     };
 

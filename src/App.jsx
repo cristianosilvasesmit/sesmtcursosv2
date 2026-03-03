@@ -21,7 +21,21 @@ import Certificate from './pages/Certificate'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 
+import { supabase } from './lib/supabaseClient'
+import { useNavigate } from 'react-router-dom'
+
 function App() {
+  const navigate = useNavigate()
+
+  React.useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        navigate('/reset-password')
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [navigate])
+
   return (
     <Router>
       <div className="app">
