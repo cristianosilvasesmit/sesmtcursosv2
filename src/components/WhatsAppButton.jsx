@@ -2,7 +2,7 @@ import React from 'react';
 
 const WhatsAppButton = () => {
     // Número de telefone da CSE (exemplo - você pode alterar depois)
-    const phoneNumber = '5511999999999';
+    const phoneNumber = '5541999548422';
     const message = 'Olá! Gostaria de mais informações sobre os treinamentos da CSE.';
 
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
