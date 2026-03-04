@@ -37,6 +37,50 @@ const Dashboard = () => {
         }
     }, [user, checkOwnership, purchaseCourse]);
 
+    const [stats, setStats] = useState({
+        totalAlunos: 0,
+        vendasMes: 0,
+        leadsHoje: 0
+    });
+
+    useEffect(() => {
+        if (!user || user.role !== 'admin') return;
+
+        const fetchStats = async () => {
+            try {
+                // 1. Total Alunos (Baseado em matriculas únicas)
+                const { data: enrollments, error: enrollError } = await supabase
+                    .from('enrollments')
+                    .select('user_id');
+
+                if (!enrollError && enrollments) {
+                    const uniqueUsers = new Set(enrollments.map(e => e.user_id));
+                    setStats(prev => ({ ...prev, totalAlunos: uniqueUsers.size }));
+
+                    // 2. Vendas Mês (Soma dos preços dos cursos matriculados)
+                    // Nota: Fazemos um join manual simples ou buscamos os cursos
+                    let totalVendas = 0;
+                    enrollments.forEach(e => {
+                        const course = courses.find(c => c.id === e.course_id);
+                        if (course) {
+                            const price = parseFloat(course.price.replace(',', '.'));
+                            if (!isNaN(price)) totalVendas += price;
+                        }
+                    });
+                    setStats(prev => ({ ...prev, vendasMes: totalVendas }));
+                }
+
+                // 3. Leads (Zero por enquanto já que não há tabela física)
+                setStats(prev => ({ ...prev, leadsHoje: 0 }));
+
+            } catch (err) {
+                console.error("Erro ao carregar estatísticas:", err);
+            }
+        };
+
+        fetchStats();
+    }, [user, courses]);
+
     useEffect(() => {
         if (!user || !user.id) return;
 
@@ -100,9 +144,9 @@ const Dashboard = () => {
                         {/* KPIs - Command Center Metrics */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
                             {[
-                                { label: 'TOTAL ALUNOS', value: '1,248', color: '#3b82f6', icon: '👥' },
-                                { label: 'VENDAS MÊS', value: 'R$ 15.4k', color: '#22c55e', icon: '💰' },
-                                { label: 'LEADS HOJE', value: '12', color: 'var(--accent-yellow)', icon: '🔥' },
+                                { label: 'TOTAL ALUNOS', value: stats.totalAlunos, color: '#3b82f6', icon: '👥' },
+                                { label: 'VENDAS MÊS', value: stats.vendasMes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), color: '#22c55e', icon: '💰' },
+                                { label: 'LEADS HOJE', value: stats.leadsHoje, color: 'var(--accent-yellow)', icon: '🔥' },
                                 { label: 'CURSOS ATIVOS', value: courses.length, color: 'var(--primary-red)', icon: '📚' }
                             ].map((kpi, idx) => (
                                 <div key={idx} className="glass-card" style={{ padding: '1.5rem', borderLeft: `4px solid ${kpi.color}`, background: 'rgba(255,255,255,0.02)' }}>

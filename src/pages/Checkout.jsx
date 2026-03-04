@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { useCourses } from '../context/CourseContext';
 import { usePayment } from '../context/PaymentContext';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const Checkout = () => {
     const { id } = useParams();
+    const { user } = useAuth();
+    const { courses } = useCourses();
     const { mpConfig, createPreference } = usePayment();
     const navigate = useNavigate();
     const [course, setCourse] = useState(null);
@@ -32,7 +35,7 @@ const Checkout = () => {
 
         try {
             // Chamada real para gerar a preferência de pagamento no Mercado Pago
-            const preference = await createPreference(course);
+            const preference = await createPreference(user.id, course);
 
             // Decidir qual URL de checkout usar (Sandbox ou Produção)
             const checkoutUrl = mpConfig.sandboxMode

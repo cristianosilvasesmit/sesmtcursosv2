@@ -5,21 +5,49 @@ const PaymentContext = createContext();
 
 export const PaymentProvider = ({ children }) => {
     const [mpConfig, setMpConfig] = useState({
-        accessToken: localStorage.getItem('mp_access_token') || '',
-        publicKey: localStorage.getItem('mp_public_key') || '',
-        sandboxMode: localStorage.getItem('mp_sandbox_mode') === 'true' || true,
+        accessToken: '',
+        publicKey: '',
+        sandboxMode: true,
     });
     const [transactions, setTransactions] = useState([]);
 
+    // 1. Carregar configurações do Banco (Supabase)
     useEffect(() => {
-        // Persistir no localStorage para conveniência local
-        localStorage.setItem('mp_access_token', mpConfig.accessToken);
-        localStorage.setItem('mp_public_key', mpConfig.publicKey);
-        localStorage.setItem('mp_sandbox_mode', mpConfig.sandboxMode);
-    }, [mpConfig]);
+        const fetchConfig = async () => {
+            const { data, error } = await supabase
+                .from('settings')
+                .select('value')
+                .eq('key', 'mercadopago')
+                .single();
 
-    const updateMpConfig = (newConfig) => {
-        setMpConfig(prev => ({ ...prev, ...newConfig }));
+            if (!error && data) {
+                setMpConfig(data.value);
+            } else {
+                // Fallback para localStorage se o banco falhar ou estiver vazio
+                const local = {
+                    accessToken: localStorage.getItem('mp_access_token') || '',
+                    publicKey: localStorage.getItem('mp_public_key') || '',
+                    sandboxMode: localStorage.getItem('mp_sandbox_mode') === 'true' || true,
+                };
+                setMpConfig(local);
+            }
+        };
+        fetchConfig();
+    }, []);
+
+    const updateMpConfig = async (newConfig) => {
+        const updated = { ...mpConfig, ...newConfig };
+        setMpConfig(updated);
+
+        // Persistir local e no banco
+        localStorage.setItem('mp_access_token', updated.accessToken);
+        localStorage.setItem('mp_public_key', updated.publicKey);
+        localStorage.setItem('mp_sandbox_mode', updated.sandboxMode);
+
+        await supabase
+            .from('settings')
+            .update({ value: updated })
+            .eq('key', 'mercadopago');
     };
 
     // Simulação de busca de eventos de webhook
@@ -36,7 +64,7 @@ export const PaymentProvider = ({ children }) => {
         fetchPaymentEvents();
     }, []);
 
-    const createPreference = async (course) => {
+    const createPreference = async (userId, course) => {
         if (!mpConfig.accessToken) {
             throw new Error("Access Token não configurado. Vá ao Dashboard > Financeiro.");
         }
@@ -58,6 +86,7 @@ export const PaymentProvider = ({ children }) => {
                             currency_id: 'BRL'
                         }
                     ],
+                    external_reference: `${userId}|${course.id}`,
                     back_urls: {
                         success: `${window.location.origin}/dashboard?status=success&courseId=${course.id}`,
                         failure: `${window.location.origin}/checkout/${course.id}?status=failure`,
