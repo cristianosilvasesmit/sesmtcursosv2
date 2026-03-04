@@ -14,8 +14,20 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Obter token do hCaptcha
-        const captchaToken = window.hcaptcha.getResponse();
+        // Obter token do hCaptcha com segurança
+        let captchaToken = '';
+        try {
+            if (window.hcaptcha) {
+                captchaToken = window.hcaptcha.getResponse();
+            } else {
+                setError('O sistema de segurança (Captcha) está carregando. Aguarde um instante.');
+                return;
+            }
+        } catch (err) {
+            setError('Erro no sistema de segurança. Por favor, recarregue a página.');
+            return;
+        }
+
         if (!captchaToken) {
             setError('Por favor, complete a verificação de segurança (Captcha).');
             return;

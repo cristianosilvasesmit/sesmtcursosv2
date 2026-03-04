@@ -11,10 +11,23 @@ const ForgotPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Obter token do hCaptcha
-        const captchaToken = window.hcaptcha.getResponse();
+        // Obter token do hCaptcha com segurança
+        let captchaToken = '';
+        try {
+            if (window.hcaptcha) {
+                captchaToken = window.hcaptcha.getResponse();
+            } else {
+                setMessage({ type: 'error', text: 'O sistema de segurança (Captcha) ainda está carregando. Aguarde um instante.' });
+                return;
+            }
+        } catch (err) {
+            console.error("Erro ao obter captcha:", err);
+            setMessage({ type: 'error', text: 'Erro no sistema de segurança. Recarregue a página.' });
+            return;
+        }
+
         if (!captchaToken) {
-            setMessage({ type: 'error', text: 'Por favor, complete a verificação de segurança (Captcha).' });
+            setMessage({ type: 'error', text: 'Por favor, complete a verificação de segurança (Captcha) antes de continuar.' });
             return;
         }
 
