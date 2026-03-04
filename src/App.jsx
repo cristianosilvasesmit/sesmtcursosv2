@@ -36,10 +36,10 @@ function App() {
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Evento Auth em App.jsx:", event, session ? "Sessão Ativa" : "Sem Sessão")
+      console.log("Radar de Segurança (App.jsx) - Evento:", event)
 
       if (event === 'PASSWORD_RECOVERY') {
-        console.log("🔄 Redirecionando para /reset-password via App.jsx")
+        console.log("🚀 Link de recuperação detectado! Redirecionando para página de nova senha...")
         navigate('/reset-password')
       }
     })

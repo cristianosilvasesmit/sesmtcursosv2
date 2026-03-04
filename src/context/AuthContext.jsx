@@ -70,7 +70,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     const sendPasswordReset = async (email) => {
-        const resetLink = window.location.origin.replace(/\/$/, '') + '/reset-password';
+        // Redirecionamos para a raiz (Home) para evitar o erro 404 do Vercel
+        // O radar de segurança no App.jsx detectará o evento e abrirá a tela de reset
+        const resetLink = window.location.origin;
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: resetLink,
         });
