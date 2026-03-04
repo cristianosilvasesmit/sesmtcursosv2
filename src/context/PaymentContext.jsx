@@ -87,7 +87,10 @@ export const PaymentProvider = ({ children }) => {
                         }
                     ],
                     payer: {
-                        email: user.email
+                        email: user.email,
+                        name: user.name,
+                        first_name: user.name.split(' ')[0],
+                        last_name: user.name.split(' ').slice(1).join(' ') || 'Aluno'
                     },
                     external_reference: `${user.id}|${course.id}`,
                     back_urls: {
