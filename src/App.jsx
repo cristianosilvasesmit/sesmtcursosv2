@@ -36,11 +36,10 @@ function App() {
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Evento Auth em App.jsx:", event)
-      if (event === 'PASSWORD_RECOVERY') {
-        console.log("Redirecionando para /reset-password...")
-        navigate('/reset-password')
-      }
+      console.log("Evento Auth em App.jsx:", event, session ? "Sessão Ativa" : "Sem Sessão")
+
+      // Removemos o navigate automático daqui para evitar conflito com bots
+      // A página /reset-password deve ser a única a lidar com isso
     })
     return () => subscription.unsubscribe()
   }, [navigate])

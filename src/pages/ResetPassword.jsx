@@ -1,17 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabaseClient';
 
 const ResetPassword = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isReady, setIsReady] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
     const { updatePassword } = useAuth();
     const navigate = useNavigate();
 
+    useEffect(() => {
+        // Verificar se temos uma sessão de recuperação ativa
+        console.log("Verificando sessão de recuperação...");
+
+        const checkSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            console.log("Sessão atual no Reset:", session ? "Ativa" : "Nula");
+
+            // O evento onAuthStateChange também ajuda aqui
+            const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+                console.log("Evento detectado no ResetPassword:", event);
+                if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && window.location.hash.includes('type=recovery'))) {
+                    setIsReady(true);
+                }
+            });
+
+            // Se já tiver uma sessão e for do tipo recovery ou houver hash de recovery
+            if (session || window.location.hash.includes('type=recovery')) {
+                setIsReady(true);
+            }
+
+            return () => subscription.unsubscribe();
+        };
+
+        checkSession();
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!isReady) {
+            setMessage({ type: 'error', text: 'Sessão de recuperação não iniciada. Tente clicar no link do e-mail novamente.' });
+            return;
+        }
 
         if (password !== confirmPassword) {
             setMessage({ type: 'error', text: 'As senhas não coincidem.' });
