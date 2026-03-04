@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabaseClient';
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
-    const { courses, checkOwnership } = useCourses();
+    const { courses, checkOwnership, purchaseCourse } = useCourses();
     const { primaryColor, changeThemeColor } = useTheme();
     const { mpConfig, updateMpConfig, transactions } = usePayment();
     const navigate = useNavigate();
