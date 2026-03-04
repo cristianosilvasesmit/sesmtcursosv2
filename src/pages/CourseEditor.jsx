@@ -89,10 +89,47 @@ const CourseEditor = () => {
                         )}
                     </div>
 
-                    {/* Basic Info Preview */}
+                    {/* Basic Info Preview & Capa Editor */}
                     <div className="glass-card" style={{ padding: '2rem', height: 'fit-content' }}>
-                        <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>RESUMO DO CURSO</h3>
-                        <img src={course.image} alt="Capa" style={{ width: '100%', borderRadius: '4px', marginBottom: '1.5rem' }} />
+                        <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>RESUMO & CAPA</h3>
+
+                        <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+                            <img src={course.image} alt="Capa" style={{ width: '100%', borderRadius: '4px', border: '1px solid var(--industrial-border)' }} />
+                            <label
+                                htmlFor="hero-upload"
+                                style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'var(--primary-red)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}
+                            >
+                                ALTERAR FOTO
+                            </label>
+                            <input
+                                id="hero-upload"
+                                type="file"
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                            updateCourse(course.id, { image: reader.result });
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                }}
+                            />
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.5rem' }}>OU COLE A URL DA IMAGEM</label>
+                            <input
+                                type="text"
+                                placeholder="https://..."
+                                value={course.image?.startsWith('data:') ? '' : course.image}
+                                onChange={(e) => updateCourse(course.id, { image: e.target.value })}
+                                style={{ width: '100%', padding: '0.6rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
+                            />
+                        </div>
+
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
                                 <span style={{ color: 'var(--text-muted)' }}>Status:</span>
@@ -100,7 +137,12 @@ const CourseEditor = () => {
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
                                 <span style={{ color: 'var(--text-muted)' }}>Preço:</span>
-                                <span style={{ fontWeight: 700 }}>R$ {course.price}</span>
+                                <input
+                                    type="text"
+                                    value={course.price}
+                                    onChange={(e) => updateCourse(course.id, { price: e.target.value })}
+                                    style={{ background: 'transparent', border: 'none', color: 'white', fontWeight: 700, textAlign: 'right', width: '80px', borderBottom: '1px dashed var(--industrial-border)' }}
+                                />
                             </div>
                         </div>
                     </div>

@@ -101,7 +101,22 @@ const CourseCreator = () => {
                         </div>
 
                         <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>CAPA DO CURSO (UPLOAD)</label>
+                            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>CAPA DO CURSO</label>
+
+                            <input
+                                type="text"
+                                placeholder="Cole a URL da Imagem (Ex: https://...)"
+                                value={formData.image?.startsWith('data:') ? '' : formData.image}
+                                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', marginBottom: '1rem' }}
+                            />
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+                                <div style={{ flex: 1, height: '1px', background: 'var(--industrial-border)' }}></div>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>OU RE-SUBIR ARQUIVO</span>
+                                <div style={{ flex: 1, height: '1px', background: 'var(--industrial-border)' }}></div>
+                            </div>
+
                             <div style={{
                                 border: '2px dashed var(--industrial-border)',
                                 padding: '2rem',
