@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCourses } from '../context/CourseContext';
+import { useTheme } from '../context/ThemeContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
     const { courses, checkOwnership } = useCourses();
+    const { primaryColor, changeThemeColor } = useTheme();
     const navigate = useNavigate();
     const [courseProgress, setCourseProgress] = useState({});
     const [activeTab, setActiveTab] = useState('cursos'); // 'cursos', 'alunos', 'leads', 'interface'
@@ -210,11 +212,34 @@ const Dashboard = () => {
                             <div className="glass-card" style={{ padding: '2rem' }}>
                                 <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem' }}>CORES PRINCIPAIS</h4>
                                 <div style={{ display: 'flex', gap: '1rem' }}>
-                                    {['#ff0000', '#3b82f6', '#22c55e', '#fbbf24'].map(color => (
-                                        <div key={color} style={{ width: '40px', height: '40px', background: color, borderRadius: '50%', border: '2px solid white', cursor: 'pointer' }}></div>
+                                    {[
+                                        { val: '#ff0000', label: 'Vermelho CSE' },
+                                        { val: '#3b82f6', label: 'Azul Industrial' },
+                                        { val: '#22c55e', label: 'Verde Segurança' },
+                                        { val: '#fbbf24', label: 'Amarelo Alerta' },
+                                        { val: '#a855f7', label: 'Roxo Elite' }
+                                    ].map(color => (
+                                        <div
+                                            key={color.val}
+                                            onClick={() => changeThemeColor(color.val)}
+                                            title={color.label}
+                                            style={{
+                                                width: '45px',
+                                                height: '45px',
+                                                background: color.val,
+                                                borderRadius: '50%',
+                                                border: primaryColor === color.val ? '3px solid white' : '2px solid rgba(255,255,255,0.1)',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s',
+                                                boxShadow: primaryColor === color.val ? `0 0 15px ${color.val}` : 'none',
+                                                transform: primaryColor === color.val ? 'scale(1.1)' : 'scale(1)'
+                                            }}
+                                        ></div>
                                     ))}
                                 </div>
-                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '1rem' }}>Altere a identidade visual da landing page e do portal.</p>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '1.5rem' }}>
+                                    A cor selecionada será aplicada em todos os botões, ícones e destaques do site.
+                                </p>
                             </div>
 
                             <div className="glass-card" style={{ padding: '2rem' }}>
