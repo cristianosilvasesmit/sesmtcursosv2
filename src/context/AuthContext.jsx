@@ -90,8 +90,18 @@ export const AuthProvider = ({ children }) => {
         if (error) throw error;
     };
 
+    const verifyResetCode = async (email, token) => {
+        const { data, error } = await supabase.auth.verifyOtp({
+            email,
+            token,
+            type: 'recovery'
+        });
+        if (error) throw error;
+        return data;
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, signup, logout, loading, sendPasswordReset, updatePassword }}>
+        <AuthContext.Provider value={{ user, login, signup, logout, loading, sendPasswordReset, updatePassword, verifyResetCode }}>
             {!loading && children}
         </AuthContext.Provider>
     );
