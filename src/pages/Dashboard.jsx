@@ -15,6 +15,28 @@ const Dashboard = () => {
     const [courseProgress, setCourseProgress] = useState({});
     const [activeTab, setActiveTab] = useState('cursos'); // 'cursos', 'alunos', 'leads', 'interface', 'financeiro'
 
+    // Efeito para capturar o retorno do Mercado Pago
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('status');
+        const courseId = params.get('courseId');
+
+        if (status === 'success' && courseId && user) {
+            const enrollUser = async () => {
+                const alreadyOwned = checkOwnership(user.id, courseId);
+                if (!alreadyOwned) {
+                    const success = await purchaseCourse(user.id, courseId);
+                    if (success) {
+                        alert("Parabéns! Seu pagamento foi confirmado e o curso já está disponível.");
+                        // Limpa os params da URL para não reenviar
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                }
+            };
+            enrollUser();
+        }
+    }, [user, checkOwnership, purchaseCourse]);
+
     useEffect(() => {
         if (!user || !user.id) return;
 

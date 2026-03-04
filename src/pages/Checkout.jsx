@@ -5,9 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const Checkout = () => {
     const { id } = useParams();
-    const { user } = useAuth();
-    const { courses, purchaseCourse } = useCourses();
-    const { mpConfig } = usePayment();
+    const { mpConfig, createPreference } = usePayment();
     const navigate = useNavigate();
     const [course, setCourse] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -23,23 +21,33 @@ const Checkout = () => {
             alert("Você precisa estar logado para comprar.");
             return;
         }
+
+        if (!mpConfig.accessToken) {
+            alert("Erro de Configuração: O administrador (Fábio) ainda não configurou o Access Token do Mercado Pago no Dashboard.");
+            return;
+        }
+
         setIsProcessing(true);
         setStep('processing');
 
         try {
-            // Delay simulado para experiência de pagamento
-            await new Promise(resolve => setTimeout(resolve, 2500));
+            // Chamada real para gerar a preferência de pagamento no Mercado Pago
+            const preference = await createPreference(course);
 
-            const success = await purchaseCourse(user.id, id);
+            // Decidir qual URL de checkout usar (Sandbox ou Produção)
+            const checkoutUrl = mpConfig.sandboxMode
+                ? preference.sandbox_init_point
+                : preference.init_point;
 
-            if (success) {
-                setStep('success');
+            if (checkoutUrl) {
+                // Redireciona o usuário para o Mercado Pago
+                window.location.href = checkoutUrl;
             } else {
-                throw new Error("Falha no registro da matrícula");
+                throw new Error("Link de checkout não gerado pelo Mercado Pago.");
             }
         } catch (err) {
-            console.error("Erro no checkout:", err);
-            alert("Ocorreu um erro ao processar seu acesso. Por favor, tente novamente.");
+            console.error("Erro no checkout real:", err);
+            alert(`Erro no Pagamento: ${err.message}`);
             setStep('payment');
         } finally {
             setIsProcessing(false);
