@@ -27,6 +27,14 @@ function App() {
   const navigate = useNavigate()
 
   React.useEffect(() => {
+    // Verificar se há erro na URL (ex: link expirado)
+    const hash = window.location.hash
+    if (hash.includes('error_code=otp_expired')) {
+      alert("Este link de recuperação expirou ou já foi usado. Por favor, solicite um novo e-mail.")
+      // Limpa o hash para não repetir o alerta
+      window.history.replaceState(null, null, window.location.pathname)
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Evento Auth em App.jsx:", event)
       if (event === 'PASSWORD_RECOVERY') {
