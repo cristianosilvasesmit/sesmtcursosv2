@@ -11,7 +11,7 @@ import Contato from './pages/Contato'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Dashboard from './pages/Dashboard'
-import LeadsManagement from './pages/LeadsManagement'
+import EADSettings from './pages/EADSettings'
 import EADSettings from './pages/EADSettings'
 import CourseCreator from './pages/CourseCreator'
 import CourseEditor from './pages/CourseEditor'
@@ -61,7 +61,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/leads" element={<LeadsManagement />} />
+        <Route path="/ead-settings" element={<EADSettings />} />
         <Route path="/ead-settings" element={<EADSettings />} />
         <Route path="/create-course" element={<CourseCreator />} />
         <Route path="/edit-course/:id" element={<CourseEditor />} />

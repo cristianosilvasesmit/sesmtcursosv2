@@ -53,6 +53,14 @@ const Dashboard = () => {
                     .from('enrollments')
                     .select('user_id, course_id, created_at');
 
+                // 2. Leads Hoje
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const { count: leadsTodayCount } = await supabase
+                    .from('leads')
+                    .select('*', { count: 'exact', head: true })
+                    .gte('created_at', today.toISOString());
+
                 if (!enrollError && enrollments) {
                     const uniqueUsers = new Set(enrollments.map(e => e.user_id));
 
@@ -81,7 +89,7 @@ const Dashboard = () => {
                     setStats({
                         totalAlunos: uniqueUsers.size,
                         vendasMes: totalVendas,
-                        leadsHoje: 0 // Implementaremos quando houver tabela de leads
+                        leadsHoje: leadsTodayCount || 0
                     });
                 }
             } catch (err) {
@@ -269,12 +277,7 @@ const Dashboard = () => {
                 )}
 
                 {activeTab === 'leads' && (
-                    <div style={{ padding: '3rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--industrial-border)' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎯</div>
-                        <h2 style={{ color: 'white', marginBottom: '1rem' }}>Central de Leads</h2>
-                        <p style={{ color: 'var(--text-muted)' }}>Contatos interessados vindos da Home aparecerão aqui.</p>
-                        <Link to="/leads" style={{ marginTop: '2rem', display: 'inline-block', padding: '1rem 2.5rem', background: 'var(--primary-red)', color: 'white', borderRadius: '4px', fontWeight: 900, textDecoration: 'none' }}>ABRIR GERENCIADOR DE LEADS</Link>
-                    </div>
+                    <LeadsTab />
                 )}
 
                 {activeTab === 'interface' && (
@@ -548,6 +551,99 @@ const AlunosTab = ({ courses }) => {
                         }) : (
                             <tr>
                                 <td colSpan="4" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Nenhum aluno matriculado ainda.</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
+const LeadsTab = () => {
+    const [leads, setLeads] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchLeads = async () => {
+            const { data, error } = await supabase
+                .from('leads')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (!error) setLeads(data);
+            setLoading(false);
+        };
+        fetchLeads();
+    }, []);
+
+    const updateStatus = async (id, newStatus) => {
+        const { error } = await supabase.from('leads').update({ status: newStatus }).eq('id', id);
+        if (!error) setLeads(prev => prev.map(l => l.id === id ? { ...l, status: newStatus } : l));
+    };
+
+    if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '2rem' }}>Carregando leads...</div>;
+
+    return (
+        <div className="glass-card" style={{ padding: '2rem', border: '1px solid var(--industrial-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ fontSize: '1.5rem' }}>🎯</div>
+                    <h2 style={{ color: 'white' }}>Gestão de Leads Reais</h2>
+                </div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Total: {leads.length} contatos</div>
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+                    <thead>
+                        <tr style={{ borderBottom: '2px solid var(--industrial-border)', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+                            <th style={{ padding: '1rem' }}>NOME</th>
+                            <th style={{ padding: '1rem' }}>E-MAIL</th>
+                            <th style={{ padding: '1rem' }}>MENSAGEM</th>
+                            <th style={{ padding: '1rem' }}>DATA</th>
+                            <th style={{ padding: '1rem' }}>STATUS</th>
+                            <th style={{ padding: '1rem' }}>AÇÃO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {leads.length > 0 ? leads.map((lead, idx) => (
+                            <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.85rem' }}>
+                                <td style={{ padding: '1rem', color: 'white', fontWeight: 700 }}>{lead.name.toUpperCase()}</td>
+                                <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{lead.email}</td>
+                                <td style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.75rem', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={lead.message}>
+                                    {lead.message}
+                                </td>
+                                <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>
+                                    {new Date(lead.created_at).toLocaleDateString('pt-BR')}
+                                </td>
+                                <td style={{ padding: '1rem' }}>
+                                    <span style={{
+                                        padding: '0.2rem 0.6rem',
+                                        background: lead.status === 'Novo' ? '#ef4444' : lead.status === 'Fechado' ? '#22c55e' : '#fbbf24',
+                                        color: 'black',
+                                        borderRadius: '4px',
+                                        fontSize: '0.65rem',
+                                        fontWeight: 900
+                                    }}>
+                                        {lead.status.toUpperCase()}
+                                    </span>
+                                </td>
+                                <td style={{ padding: '1rem' }}>
+                                    <select
+                                        defaultValue={lead.status}
+                                        onChange={(e) => updateStatus(lead.id, e.target.value)}
+                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--industrial-border)', borderRadius: '4px', fontSize: '0.7rem', padding: '0.2rem' }}
+                                    >
+                                        <option value="Novo">Marcar Novo</option>
+                                        <option value="Em Contato">Em Contato</option>
+                                        <option value="Fechado">Fechado</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        )) : (
+                            <tr>
+                                <td colSpan="6" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Nenhum lead capturado ainda.</td>
                             </tr>
                         )}
                     </tbody>
