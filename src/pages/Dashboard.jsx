@@ -483,20 +483,24 @@ const FinanceiroTab = ({ mpConfig, updateMpConfig, transactions }) => {
 
 // Sub-componente para Gestão de Alunos
 const AlunosTab = ({ courses }) => {
-    const [enrollments, setEnrollments] = useState([]);
+    const [data, setData] = useState({ enrollments: [], profiles: [] });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchEnrollments = async () => {
-            const { data, error } = await supabase
-                .from('enrollments')
-                .select('*')
-                .order('created_at', { ascending: false });
+        const fetchData = async () => {
+            // Buscar matriculas e perfis em paralelo
+            const [enrRes, profRes] = await Promise.all([
+                supabase.from('enrollments').select('*').order('created_at', { ascending: false }),
+                supabase.from('profiles').select('*')
+            ]);
 
-            if (!error) setEnrollments(data);
+            setData({
+                enrollments: enrRes.data || [],
+                profiles: profRes.data || []
+            });
             setLoading(false);
         };
-        fetchEnrollments();
+        fetchData();
     }, []);
 
     if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '2rem' }}>Carregando dados dos alunos...</div>;
@@ -512,20 +516,23 @@ const AlunosTab = ({ courses }) => {
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
                     <thead>
                         <tr style={{ borderBottom: '2px solid var(--industrial-border)', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-                            <th style={{ padding: '1rem' }}>ALUNO (ID)</th>
+                            <th style={{ padding: '1rem' }}>ALUNO</th>
                             <th style={{ padding: '1rem' }}>CURSO</th>
                             <th style={{ padding: '1rem' }}>DATA MATRÍCULA</th>
                             <th style={{ padding: '1rem' }}>STATUS</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {enrollments.length > 0 ? enrollments.map((enr, idx) => {
+                        {data.enrollments.length > 0 ? data.enrollments.map((enr, idx) => {
                             const course = courses.find(c => c.id === enr.course_id);
+                            const profile = data.profiles.find(p => p.id === enr.user_id);
                             return (
                                 <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.85rem' }}>
                                     <td style={{ padding: '1rem' }}>
-                                        <div style={{ color: 'white', fontWeight: 700 }}>{enr.user_id.substring(0, 8)}...</div>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>ID: {enr.user_id}</div>
+                                        <div style={{ color: 'white', fontWeight: 700, textTransform: 'uppercase' }}>
+                                            {profile?.full_name || 'Usuário não identificado'}
+                                        </div>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{profile?.email || `ID: ${enr.user_id.substring(0, 8)}...`}</div>
                                     </td>
                                     <td style={{ padding: '1rem' }}>
                                         <div style={{ color: 'white' }}>{course?.title || 'Curso Removido'}</div>
