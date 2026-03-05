@@ -64,23 +64,23 @@ export const PaymentProvider = ({ children }) => {
         fetchPaymentEvents();
     }, []);
 
-    const createPreference = async (user, course) => {
+    const processPayment = async (user, course, paymentData) => {
         try {
-            const response = await fetch('/api/payment/create', {
+            const response = await fetch('/api/payment/process', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ user, course })
+                body: JSON.stringify({ user, course, payment_data: paymentData })
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                console.log("Pix Gerado com Sucesso:", data);
+                console.log("Pagamento Processado com Sucesso:", data);
                 return data;
             } else {
-                throw new Error(data.error || data.message || "Erro ao gerar o Pix");
+                throw new Error(data.error || data.message || "Erro ao processar o pagamento");
             }
         } catch (err) {
             console.error("Erro no Fluxo de Pagamento Direct:", err);
@@ -94,7 +94,8 @@ export const PaymentProvider = ({ children }) => {
             updateMpConfig,
             transactions,
             fetchPaymentEvents,
-            createPreference
+            createPreference: processPayment, // Alias para compatibilidade
+            processPayment
         }}>
             {children}
         </PaymentContext.Provider>

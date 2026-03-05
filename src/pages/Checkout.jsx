@@ -8,40 +8,106 @@ const Checkout = () => {
     const { id } = useParams();
     const { user } = useAuth();
     const { courses } = useCourses();
-    const { mpConfig, createPreference } = usePayment();
+    const { mpConfig, processPayment } = usePayment();
     const navigate = useNavigate();
     const [course, setCourse] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [step, setStep] = useState('payment'); // 'payment', 'processing', 'success', 'pix_waiting'
     const [pixData, setPixData] = useState(null);
+    const [paymentMethod, setPaymentMethod] = useState('pix'); // 'pix' ou 'card'
+    const [mp, setMp] = useState(null);
 
     useEffect(() => {
         const found = courses.find(c => c.id === id);
         if (found) setCourse(found);
     }, [id, courses]);
 
-    const handlePayment = async () => {
-        if (!user) {
-            alert("Você precisa estar logado para comprar.");
-            return;
+    // Inicializar Mercado Pago
+    useEffect(() => {
+        if (mpConfig.publicKey && window.MercadoPago && !mp) {
+            const mpInstance = new window.MercadoPago(mpConfig.publicKey, {
+                locale: 'pt-BR'
+            });
+            setMp(mpInstance);
         }
+    }, [mpConfig.publicKey, mp]);
 
+    // Inicializar Card Brick quando trocar para 'card'
+    useEffect(() => {
+        if (paymentMethod === 'card' && mp && course && step === 'payment') {
+            renderCardBrick();
+        }
+    }, [paymentMethod, mp, course, step]);
+
+    const renderCardBrick = async () => {
+        const bricksBuilder = mp.bricks();
+
+        // Limpa o container antes de renderizar (evita duplicidade)
+        const container = document.getElementById('cardPaymentBrick_container');
+        if (container) container.innerHTML = '';
+
+        return await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', {
+            initialization: {
+                amount: parseFloat(course.price.replace('.', '').replace(',', '.')),
+            },
+            customization: {
+                visual: {
+                    style: {
+                        theme: 'default', // Pode ser 'dark' se o fundo for escuro
+                    },
+                },
+                paymentMethods: {
+                    maxInstallments: 12,
+                }
+            },
+            callbacks: {
+                onReady: () => {
+                    console.log("Card Brick Pronto");
+                },
+                onSubmit: async (formData) => {
+                    setIsProcessing(true);
+                    setStep('processing');
+                    try {
+                        const result = await processPayment(user, course, formData);
+                        if (result.status === 'approved') {
+                            setStep('success');
+                        } else {
+                            alert(`Status do Pagamento: ${result.status_detail || result.status}`);
+                            setStep('payment');
+                        }
+                    } catch (error) {
+                        alert(error.message);
+                        setStep('payment');
+                    } finally {
+                        setIsProcessing(false);
+                    }
+                },
+                onError: (error) => {
+                    console.error("Erro Brick:", error);
+                    alert("Erro ao carregar formulário de cartão.");
+                },
+            },
+        });
+    };
+
+    const handlePixPayment = async () => {
         setIsProcessing(true);
         setStep('processing');
 
         try {
-            // Chamada para nossa API interna que gera o Pix Direto
-            const result = await createPreference(user, course);
+            const result = await processPayment(user, course, {
+                payment_method_id: 'pix',
+                transaction_amount: parseFloat(course.price.replace('.', '').replace(',', '.'))
+            });
 
-            if (result.qr_code) {
-                setPixData(result);
+            if (result.point_of_interaction?.transaction_data?.qr_code) {
+                setPixData(result.point_of_interaction.transaction_data);
                 setStep('pix_waiting');
             } else {
                 throw new Error("Não foi possível gerar os dados do Pix.");
             }
         } catch (err) {
-            console.error("Erro no checkout transparente:", err);
-            alert(`Erro no Pagamento: ${err.message}`);
+            alert(`Erro no Pix: ${err.message}`);
             setStep('payment');
         } finally {
             setIsProcessing(false);
@@ -57,31 +123,60 @@ const Checkout = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
                         {/* Lado Esquerdo - Detalhes do Pagamento */}
                         <div style={{ background: 'white', padding: '2.5rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2.5rem' }}>
                                 <div style={{ width: '40px', height: '40px', background: '#009ee3', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900 }}>MP</div>
-                                <h2 style={{ fontSize: '1.2rem', color: '#009ee3' }}>Pagamento Direto <span style={{ color: '#999', fontWeight: 400, fontSize: '0.9rem' }}>| Seguro & Rápido</span></h2>
+                                <h2 style={{ fontSize: '1.2rem', color: '#009ee3' }}>Finalizar Matrícula <span style={{ color: '#999', fontWeight: 400, fontSize: '0.9rem' }}>| Checkout Seguro</span></h2>
                             </div>
 
-                            <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>Finalize sua matrícula via Pix</h3>
+                            {/* Seletor de Método */}
+                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2.5rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
+                                <button
+                                    onClick={() => setPaymentMethod('pix')}
+                                    style={{
+                                        flex: 1, padding: '1rem', border: 'none', borderRadius: '4px', cursor: 'pointer',
+                                        background: paymentMethod === 'pix' ? '#f0f9ff' : 'transparent',
+                                        borderBottom: paymentMethod === 'pix' ? '3px solid #009ee3' : '3px solid transparent',
+                                        fontWeight: 700, color: paymentMethod === 'pix' ? '#009ee3' : '#999',
+                                        transition: 'all 0.3s'
+                                    }}
+                                >
+                                    💠 PIX
+                                </button>
+                                <button
+                                    onClick={() => setPaymentMethod('card')}
+                                    style={{
+                                        flex: 1, padding: '1rem', border: 'none', borderRadius: '4px', cursor: 'pointer',
+                                        background: paymentMethod === 'card' ? '#f0f9ff' : 'transparent',
+                                        borderBottom: paymentMethod === 'card' ? '3px solid #009ee3' : '3px solid transparent',
+                                        fontWeight: 700, color: paymentMethod === 'card' ? '#009ee3' : '#999',
+                                        transition: 'all 0.3s'
+                                    }}
+                                >
+                                    💳 CARTÃO
+                                </button>
+                            </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                <div style={{ padding: '1.5rem', border: '2px solid #009ee3', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1.5rem', background: '#f0f9ff' }}>
-                                    <div style={{ fontSize: '2.5rem' }}>💠</div>
-                                    <div>
-                                        <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>Pix Instantâneo</div>
-                                        <div style={{ fontSize: '0.85rem', color: '#666' }}>O QR Code será gerado na próxima tela. Aprovação imediata!</div>
+                            {paymentMethod === 'pix' ? (
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ padding: '2rem', border: '1px dashed #009ee3', borderRadius: '8px', marginBottom: '2rem', background: '#f8fafc' }}>
+                                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💠</div>
+                                        <h3 style={{ marginBottom: '0.5rem' }}>Pix Instantâneo</h3>
+                                        <p style={{ fontSize: '0.9rem', color: '#666' }}>O QR Code será gerado na próxima tela.<br />Acesso liberado na hora!</p>
                                     </div>
+                                    <button
+                                        onClick={handlePixPayment}
+                                        style={{ width: '100%', padding: '1.2rem', background: '#009ee3', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer' }}
+                                    >
+                                        GERAR QR CODE PIX
+                                    </button>
                                 </div>
-                            </div>
+                            ) : (
+                                <div>
+                                    <div id="cardPaymentBrick_container"></div>
+                                </div>
+                            )}
 
-                            <button
-                                onClick={handlePayment}
-                                style={{ width: '100%', marginTop: '2.5rem', padding: '1.2rem', background: '#009ee3', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 700, fontSize: '1.1rem', cursor: 'pointer' }}
-                            >
-                                GERAR QR CODE PIX
-                            </button>
-
-                            <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.75rem', color: '#999' }}>
+                            <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.75rem', color: '#999' }}>
                                 Pagamento 100% seguro processado pelo Mercado Pago.
                             </p>
                         </div>
