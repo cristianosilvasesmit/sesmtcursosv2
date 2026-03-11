@@ -31,35 +31,51 @@ function Navbar() {
             </nav>
 
             <div className="auth" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                {user ? (
-                    <>
-                        <Link to="/dashboard" style={{ color: 'white', fontWeight: 700, fontSize: '0.85rem' }}>OLÁ, {user.name.toUpperCase()}</Link>
-                        <button onClick={handleLogout} style={{ background: 'transparent', color: 'var(--primary-red)', fontWeight: 700, fontSize: '0.85rem' }}>SAIR</button>
-                    </>
-                ) : (
-                    <>
-                        <Link to="/login" style={{ background: 'transparent', color: 'white', fontWeight: 700, fontSize: '0.85rem' }}>LOGIN</Link>
-                        <Link to="/signup" style={{ background: '#22c55e', color: 'white', padding: '0.6rem 1.5rem', borderRadius: '4px', fontWeight: 900, fontSize: '0.85rem' }}>CADASTRE-SE</Link>
-                    </>
-                )}
+                <div className="nav-desktop" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    {user ? (
+                        <>
+                            <Link to="/dashboard" style={{ color: 'white', fontWeight: 700, fontSize: '0.85rem' }}>OLÁ, {user.name.toUpperCase()}</Link>
+                            <button onClick={handleLogout} style={{ background: 'transparent', color: 'var(--primary-red)', fontWeight: 700, fontSize: '0.85rem' }}>SAIR</button>
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/login" style={{ background: 'transparent', color: 'white', fontWeight: 700, fontSize: '0.85rem' }}>LOGIN</Link>
+                            <Link to="/signup" style={{ background: '#22c55e', color: 'white', padding: '0.6rem 1.5rem', borderRadius: '4px', fontWeight: 900, fontSize: '0.85rem' }}>CADASTRE-SE</Link>
+                        </>
+                    )}
+                </div>
 
-                {/* Botão Mobile */}
+                {/* Botão Mobile Hamburger */}
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    style={{ background: 'transparent', color: 'white', fontSize: '1.5rem', display: 'none' }}
+                    style={{ background: 'transparent', color: 'white', fontSize: '1.8rem', cursor: 'pointer' }}
                     className="mobile-toggle"
                 >
-                    ☰
+                    {isMenuOpen ? '✕' : '☰'}
                 </button>
             </div>
 
             {/* Menu Mobile Overlay */}
             {isMenuOpen && (
-                <div style={{ position: 'fixed', top: '70px', left: 0, right: 0, background: 'var(--bg-dark)', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', borderBottom: '1px solid var(--industrial-border)', zIndex: 99 }}>
-                    <Link onClick={() => setIsMenuOpen(false)} to="/" style={{ color: 'white', fontWeight: 700 }}>INÍCIO</Link>
-                    <Link onClick={() => setIsMenuOpen(false)} to="/cursos" style={{ color: 'white', fontWeight: 700 }}>TREINAMENTOS</Link>
-                    <Link onClick={() => setIsMenuOpen(false)} to="/sesmt" style={{ color: 'white', fontWeight: 700 }}>SESMT</Link>
-                    <Link onClick={() => setIsMenuOpen(false)} to="/contato" style={{ color: 'white', fontWeight: 700 }}>CONTATO</Link>
+                <div style={{ position: 'fixed', top: '70px', left: 0, right: 0, bottom: 0, background: 'rgba(10, 10, 11, 0.98)', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', zIndex: 99, backdropFilter: 'blur(10px)', borderTop: '1px solid var(--industrial-border)' }}>
+                    <Link onClick={() => setIsMenuOpen(false)} to="/" style={{ color: isActive('/') ? 'var(--primary-red)' : 'white', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>INÍCIO</Link>
+                    <Link onClick={() => setIsMenuOpen(false)} to="/cursos" style={{ color: isActive('/cursos') ? 'var(--primary-red)' : 'white', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>TREINAMENTOS</Link>
+                    <Link onClick={() => setIsMenuOpen(false)} to="/sesmt" style={{ color: isActive('/sesmt') ? 'var(--primary-red)' : 'white', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>SESMT</Link>
+                    <Link onClick={() => setIsMenuOpen(false)} to="/contato" style={{ color: isActive('/contato') ? 'var(--primary-red)' : 'white', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>CONTATO</Link>
+                    
+                    <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '1px solid var(--industrial-border)', paddingTop: '2rem' }}>
+                        {user ? (
+                            <>
+                                <Link onClick={() => setIsMenuOpen(false)} to="/dashboard" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', padding: '1.2rem', borderRadius: '4px', textAlign: 'center', fontWeight: 900 }}>DASHBOARD (OLÁ, {user.name.split(' ')[0]})</Link>
+                                <button onClick={() => { setIsMenuOpen(false); handleLogout(); }} style={{ background: 'var(--primary-red)', color: 'white', padding: '1.2rem', borderRadius: '4px', fontWeight: 900 }}>SAIR DA CONTA</button>
+                            </>
+                        ) : (
+                            <>
+                                <Link onClick={() => setIsMenuOpen(false)} to="/login" style={{ background: 'rgba(255,255,255,0.05)', color: 'white', padding: '1.2rem', borderRadius: '4px', textAlign: 'center', fontWeight: 900 }}>LOGIN / ENTRAR</Link>
+                                <Link onClick={() => setIsMenuOpen(false)} to="/signup" style={{ background: '#22c55e', color: 'white', padding: '1.2rem', borderRadius: '4px', textAlign: 'center', fontWeight: 900 }}>CADASTRE-SE AGORA</Link>
+                            </>
+                        )}
+                    </div>
                 </div>
             )}
         </header>
