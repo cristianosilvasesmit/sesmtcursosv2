@@ -21,7 +21,7 @@ const ResetPassword = () => {
             console.log("Sessão atual no Reset:", session ? "Ativa" : "Nula");
 
             // O evento onAuthStateChange também ajuda aqui
-            const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            const { data: { subscription } } = supabase.auth.onAuthStateChange((event, _session) => {
                 console.log("Evento detectado no ResetPassword:", event);
                 if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && window.location.hash.includes('type=recovery'))) {
                     setIsReady(true);

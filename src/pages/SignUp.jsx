@@ -15,7 +15,6 @@ const SignUp = () => {
 
     const [isSigningUp, setIsSigningUp] = useState(false);
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,7 +29,6 @@ const SignUp = () => {
 
         try {
             await signup(formData);
-            setSuccess(true);
             alert("Conta criada com sucesso! Verifique seu e-mail se necessário.");
             navigate('/dashboard');
         } catch (err) {
