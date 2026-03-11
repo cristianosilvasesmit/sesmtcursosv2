@@ -71,6 +71,10 @@ button {
   font-family: inherit;
 }
 
+.mobile-toggle {
+  display: none;
+}
+
 /* Utilitários de Layout */
 .container {
   max-width: 1200px;
@@ -134,10 +138,6 @@ button {
     height: auto !important;
     min-height: 100vh;
     padding: 120px 0 60px !important;
-  }
-
-  .mobile-toggle {
-    display: none;
   }
 
   .hero h1 {
