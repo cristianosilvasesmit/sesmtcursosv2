@@ -136,6 +136,10 @@ button {
     padding: 120px 0 60px !important;
   }
 
+  .mobile-toggle {
+    display: none;
+  }
+
   .hero h1 {
     font-size: 3.2rem !important;
     margin-bottom: 2rem !important;
