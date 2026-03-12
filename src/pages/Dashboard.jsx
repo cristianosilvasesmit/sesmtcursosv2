@@ -141,7 +141,7 @@ const Dashboard = () => {
         <div style={{ minHeight: '100vh', background: 'var(--bg-dark)', paddingTop: '100px', paddingBottom: '50px' }}>
             <div className="container">
                 {/* Cabeçalho de Identidade */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <div className="dash-header">
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <div style={{ width: '12px', height: '40px', background: 'var(--primary-red)' }}></div>
@@ -153,7 +153,7 @@ const Dashboard = () => {
                             Logado como: <span style={{ color: 'white', fontWeight: 700 }}>{user?.name}</span>
                         </p>
                     </div>
-                    <button onClick={handleLogout} style={{ padding: '0.8rem 1.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--industrial-border)', borderRadius: '4px', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
+                    <button className="logout-btn" onClick={handleLogout} style={{ padding: '0.8rem 1.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--industrial-border)', borderRadius: '4px', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
                         ENCERRAR SESSÃO
                     </button>
                 </div>
@@ -179,7 +179,7 @@ const Dashboard = () => {
                         </div>
 
                         {/* Navigation Tabs */}
-                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--industrial-border)', paddingBottom: '1px' }}>
+                        <div className="dash-tabs">
                             {[
                                 { id: 'cursos', label: 'GESTÃO DE CURSOS', icon: '📚' },
                                 { id: 'alunos', label: 'ALUNOS & MATRÍCULAS', icon: '👥' },
@@ -189,6 +189,7 @@ const Dashboard = () => {
                             ].map(tab => (
                                 <button
                                     key={tab.id}
+                                    className="tab-btn"
                                     onClick={() => setActiveTab(tab.id)}
                                     style={{
                                         padding: '1rem 1.5rem',
@@ -215,7 +216,7 @@ const Dashboard = () => {
                 {/* Conteúdo Dinâmico por Aba */}
                 {activeTab === 'cursos' && (
                     <div className="tab-content">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <div className="dash-section-header">
                             <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <div style={{ width: '30px', height: '2px', background: 'var(--primary-red)' }}></div>
                                 {user?.role === 'admin' ? 'CURSOS DISPONÍVEIS NA PLATAFORMA' : 'MEUS TREINAMENTOS'}
@@ -370,7 +371,7 @@ const FinanceiroTab = ({ mpConfig, updateMpConfig, transactions }) => {
                 <h2 style={{ color: 'white' }}>Configurações de Pagamento</h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 1fr', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                 <div className="glass-card" style={{ padding: '2rem' }}>
                     <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between' }}>
                         API MERCADO PAGO
