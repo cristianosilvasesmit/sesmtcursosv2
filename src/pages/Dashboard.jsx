@@ -217,8 +217,7 @@ const Dashboard = () => {
                 {activeTab === 'cursos' && (
                     <div className="tab-content">
                         <div className="dash-section-header">
-                            <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{ width: '30px', height: '2px', background: 'var(--primary-red)' }}></div>
+                            <h2 className="dash-title">
                                 {user?.role === 'admin' ? 'CURSOS DISPONÍVEIS NA PLATAFORMA' : 'MEUS TREINAMENTOS'}
                             </h2>
                             {user?.role === 'admin' && (
