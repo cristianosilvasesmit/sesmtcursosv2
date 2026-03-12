@@ -57,7 +57,7 @@ function Navbar() {
 
             {/* Menu Mobile Overlay */}
             {isMenuOpen && (
-                <div style={{ position: 'fixed', top: '70px', left: 0, right: 0, bottom: 0, background: 'var(--bg-dark)', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', zIndex: 99, borderTop: '1px solid var(--industrial-border)' }}>
+                <div style={{ position: 'fixed', top: '70px', left: 0, right: 0, bottom: 0, background: '#0a0a0b', opacity: 1, padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', zIndex: 9999, borderTop: '1px solid var(--industrial-border)', backdropFilter: 'none' }}>
                     <Link onClick={() => setIsMenuOpen(false)} to="/" style={{ color: isActive('/') ? 'var(--primary-red)' : 'white', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>INÍCIO</Link>
                     <Link onClick={() => setIsMenuOpen(false)} to="/cursos" style={{ color: isActive('/cursos') ? 'var(--primary-red)' : 'white', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>TREINAMENTOS</Link>
                     <Link onClick={() => setIsMenuOpen(false)} to="/sesmt" style={{ color: isActive('/sesmt') ? 'var(--primary-red)' : 'white', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>SESMT</Link>
