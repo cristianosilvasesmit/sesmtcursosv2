@@ -145,7 +145,7 @@ const Dashboard = () => {
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <div style={{ width: '12px', height: '40px', background: 'var(--primary-red)' }}></div>
-                            <h1 style={{ fontSize: '2rem', letterSpacing: '1px' }}>
+                            <h1 style={{ letterSpacing: '1px' }}>
                                 PAINEL <span style={{ color: 'var(--primary-red)' }}>{user?.role === 'admin' ? 'ESTRATÉGICO' : 'DO ALUNO'}</span>
                             </h1>
                         </div>
@@ -227,7 +227,7 @@ const Dashboard = () => {
                             )}
                         </div>
 
-                        <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+                        <div className="grid-responsive" style={{ display: 'grid', gap: '2rem' }}>
                             {displayCourses.length > 0 ? (
                                 displayCourses.map(course => {
                                     const progress = calculateProgress(course.id, course.lessons?.length);
