@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabaseClient';
 const Dashboard = () => {
     const { user, logout } = useAuth();
     const { courses, checkOwnership, purchaseCourse } = useCourses();
-    const { primaryColor, changeThemeColor } = useTheme();
+    const { primaryColor, changeThemeColor, themeConfig, updateTheme } = useTheme();
     const { mpConfig, updateMpConfig, transactions } = usePayment();
     const navigate = useNavigate();
     const [courseProgress, setCourseProgress] = useState({});
@@ -281,53 +281,12 @@ const Dashboard = () => {
                 )}
 
                 {activeTab === 'interface' && (
-                    <div style={{ padding: '3rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--industrial-border)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                            <div style={{ fontSize: '2rem' }}>🎨</div>
-                            <h2 style={{ color: 'white' }}>Personalização da Plataforma</h2>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                            <div className="glass-card" style={{ padding: '2rem' }}>
-                                <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem' }}>CORES PRINCIPAIS</h4>
-                                <div style={{ display: 'flex', gap: '1rem' }}>
-                                    {[
-                                        { val: '#ff0000', label: 'Vermelho CSE' },
-                                        { val: '#3b82f6', label: 'Azul Industrial' },
-                                        { val: '#22c55e', label: 'Verde Segurança' },
-                                        { val: '#fbbf24', label: 'Amarelo Alerta' },
-                                        { val: '#a855f7', label: 'Roxo Elite' }
-                                    ].map(color => (
-                                        <div
-                                            key={color.val}
-                                            onClick={() => changeThemeColor(color.val)}
-                                            title={color.label}
-                                            style={{
-                                                width: '45px',
-                                                height: '45px',
-                                                background: color.val,
-                                                borderRadius: '50%',
-                                                border: primaryColor === color.val ? '3px solid white' : '2px solid rgba(255,255,255,0.1)',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s',
-                                                boxShadow: primaryColor === color.val ? `0 0 15px ${color.val}` : 'none',
-                                                transform: primaryColor === color.val ? 'scale(1.1)' : 'scale(1)'
-                                            }}
-                                        ></div>
-                                    ))}
-                                </div>
-                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '1.5rem' }}>
-                                    A cor selecionada será aplicada em todos os botões, ícones e destaques do site.
-                                </p>
-                            </div>
-
-                            <div className="glass-card" style={{ padding: '2rem' }}>
-                                <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem' }}>BANNER PRINCIPAL</h4>
-                                <input type="text" placeholder="URL da Imagem de Fundo" style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} />
-                                <button style={{ width: '100%', marginTop: '1rem', padding: '0.8rem', background: 'white', color: 'black', fontWeight: 900, border: 'none', borderRadius: '4px' }}>SALVAR ALTERAÇÕES</button>
-                            </div>
-                        </div>
-                    </div>
+                    <InterfaceTab 
+                        themeConfig={themeConfig} 
+                        updateTheme={updateTheme} 
+                        changeThemeColor={changeThemeColor} 
+                        primaryColor={primaryColor} 
+                    />
                 )}
 
                 {activeTab === 'financeiro' && (
@@ -649,6 +608,94 @@ const LeadsTab = () => {
                     </tbody>
                 </table>
             </div>
+        </div>
+    );
+};
+
+// Sub-componente do Editor de Temas
+const InterfaceTab = ({ themeConfig, updateTheme, changeThemeColor, primaryColor }) => {
+    const [localTheme, setLocalTheme] = useState(themeConfig || {
+        fontFamily: 'Inter',
+        logoUrl: '',
+        promoBanner: { active: false, text: '' },
+        socials: { whatsapp: '', instagram: '', linkedin: '' }
+    });
+
+    useEffect(() => {
+        if (themeConfig) setLocalTheme(themeConfig);
+    }, [themeConfig]);
+
+    const handleSave = () => {
+        updateTheme(localTheme);
+        alert("✅ Configurações de interface atualizadas e salvas com sucesso!");
+    };
+
+    return (
+        <div style={{ padding: '3rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--industrial-border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                <div style={{ fontSize: '2rem' }}>🎨</div>
+                <h2 style={{ color: 'white' }}>Editor Visual do Site (Theme Builder)</h2>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                {/* 1. CORES */}
+                <div className="glass-card" style={{ padding: '2rem' }}>
+                    <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem' }}>1. COR PRINCIPAL DA MARCA</h4>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        {[
+                            { val: '#ff0000', label: 'Vermelho CSE' },
+                            { val: '#3b82f6', label: 'Azul Corporate' },
+                            { val: '#22c55e', label: 'Verde Segurança' },
+                            { val: '#fbbf24', label: 'Amarelo Alerta' },
+                            { val: '#a855f7', label: 'Roxo Elite' },
+                            { val: '#f97316', label: 'Laranja MKT' }
+                        ].map(color => (
+                            <div
+                                key={color.val}
+                                onClick={() => changeThemeColor(color.val)}
+                                title={color.label}
+                                style={{
+                                    width: '45px', height: '45px', background: color.val, borderRadius: '50%',
+                                    border: primaryColor === color.val ? '3px solid white' : '2px solid rgba(255,255,255,0.1)',
+                                    cursor: 'pointer', transition: 'all 0.2s',
+                                    boxShadow: primaryColor === color.val ? `0 0 15px ${color.val}` : 'none',
+                                    transform: primaryColor === color.val ? 'scale(1.1)' : 'scale(1)'
+                                }}
+                            ></div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 2. TIPOGRAFIA & LOGO */}
+                <div className="glass-card" style={{ padding: '2rem' }}>
+                    <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem' }}>2. IDENTIDADE DA MARCA</h4>
+                    
+                    <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>URL DO LOGOTIPO (PNG/SVG TRANSPARENTE)</label>
+                    <input type="text" value={localTheme.logoUrl || ''} onChange={(e) => setLocalTheme({...localTheme, logoUrl: e.target.value})} placeholder="https://exemplo.com/logo.png" style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px', marginBottom: '1.5rem' }} />
+
+                    <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>TIPOGRAFIA (FONTE)</label>
+                    <select value={localTheme.fontFamily || 'Inter'} onChange={(e) => setLocalTheme({...localTheme, fontFamily: e.target.value})} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }}>
+                        <option value="Inter">Moderno Padrão (Inter)</option>
+                        <option value="Oswald">Industrial Pesado (Oswald)</option>
+                        <option value="Playfair Display">Elegante/Clássico (Playfair)</option>
+                    </select>
+                </div>
+
+                {/* 3. FAIXA PROMOCIONAL */}
+                <div className="glass-card" style={{ padding: '2rem', gridColumn: '1 / -1' }}>
+                    <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        3. FAIXA PROMOCIONAL NO TOPO
+                        <div onClick={() => setLocalTheme({...localTheme, promoBanner: {...localTheme.promoBanner, active: !localTheme.promoBanner?.active}})} style={{ width: '50px', height: '26px', background: localTheme.promoBanner?.active ? '#22c55e' : 'rgba(255,255,255,0.1)', borderRadius: '13px', position: 'relative', cursor: 'pointer', transition: 'all 0.3s' }}>
+                            <div style={{ width: '20px', height: '20px', background: 'white', borderRadius: '50%', position: 'absolute', top: '3px', left: localTheme.promoBanner?.active ? '27px' : '3px', transition: 'all 0.3s' }}></div>
+                        </div>
+                    </h4>
+                    
+                    <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>TEXTO DA FAIXA</label>
+                    <input type="text" value={localTheme.promoBanner?.text || ''} onChange={(e) => setLocalTheme({...localTheme, promoBanner: {...localTheme.promoBanner, text: e.target.value}})} disabled={!localTheme.promoBanner?.active} placeholder="Ex: 🔥 Black Friday: Use o cupom SESMT20 para 20% OFF" style={{ width: '100%', padding: '0.8rem', background: localTheme.promoBanner?.active ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.5)', border: '1px solid var(--industrial-border)', color: localTheme.promoBanner?.active ? 'white' : 'var(--text-muted)', borderRadius: '4px' }} />
+                </div>
+            </div>
+
+            <button onClick={handleSave} style={{ width: '100%', marginTop: '2rem', padding: '1.2rem', background: 'var(--primary-red)', color: 'white', fontWeight: 900, border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1.1rem', boxShadow: '0 4px 15px rgba(255,0,0,0.3)' }}>APLICAR E SALVAR ALTERAÇÕES</button>
         </div>
     );
 };
