@@ -132,7 +132,7 @@ const Checkout = () => {
         <div style={{ minHeight: '100vh', background: '#f4f4f4', paddingTop: '100px', paddingBottom: '50px', color: '#333' }}>
             <div className="container" style={{ maxWidth: '900px' }}>
                 {step === 'payment' && (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
+                    <div className="checkout-grid">
                         {/* Lado Esquerdo - Detalhes do Pagamento */}
                         <div style={{ background: 'white', padding: '2.5rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2.5rem' }}>
