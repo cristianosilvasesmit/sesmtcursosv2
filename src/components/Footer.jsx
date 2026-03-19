@@ -1,6 +1,10 @@
 import React from 'react'
+import { useTheme } from '../context/ThemeContext'
 
 function Footer() {
+    const { themeConfig } = useTheme();
+    const contactInfo = themeConfig?.contactInfo || {};
+
     return (
         <footer style={{ background: '#0a0a0b', borderTop: '1px solid var(--industrial-border)', padding: '4rem 0 2rem', position: 'relative' }}>
             <div className="hazard-bg" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', backgroundImage: 'var(--hazard-pattern)', opacity: 0.5 }}></div>
@@ -27,9 +31,9 @@ function Footer() {
                     <div>
                         <h4 style={{ color: 'white', marginBottom: '1.5rem', fontSize: '0.9rem' }}>CONTATO</h4>
                         <ul style={{ listStyle: 'none', color: 'var(--text-muted)', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                            <li>contato@treinamentos.com.br</li>
-                            <li>(11) 9999-9999</li>
-                            <li>São Paulo - SP</li>
+                            <li>{contactInfo.email || 'contato@treinamentos.com.br'}</li>
+                            <li>{contactInfo.whatsapp || '(11) 9999-9999'}</li>
+                            <li>{contactInfo.addressLine2 || 'São Paulo - SP'}</li>
                         </ul>
                     </div>
                 </div>

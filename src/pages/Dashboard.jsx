@@ -614,11 +614,13 @@ const LeadsTab = () => {
 
 // Sub-componente do Editor de Temas
 const InterfaceTab = ({ themeConfig, updateTheme, changeThemeColor, primaryColor }) => {
-    const [localTheme, setLocalTheme] = useState(themeConfig || {
+    const [localTheme, setLocalTheme] = useState({
         fontFamily: 'Inter',
         logoUrl: '',
         promoBanner: { active: false, text: '' },
-        socials: { whatsapp: '', instagram: '', linkedin: '' }
+        socials: { whatsapp: '', instagram: '', linkedin: '' },
+        contactInfo: { whatsapp: '', email: '', addressLine1: '', addressLine2: '' },
+        ...themeConfig
     });
 
     useEffect(() => {
@@ -692,6 +694,30 @@ const InterfaceTab = ({ themeConfig, updateTheme, changeThemeColor, primaryColor
                     
                     <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>TEXTO DA FAIXA</label>
                     <input type="text" value={localTheme.promoBanner?.text || ''} onChange={(e) => setLocalTheme({...localTheme, promoBanner: {...localTheme.promoBanner, text: e.target.value}})} disabled={!localTheme.promoBanner?.active} placeholder="Ex: 🔥 Black Friday: Use o cupom SESMT20 para 20% OFF" style={{ width: '100%', padding: '0.8rem', background: localTheme.promoBanner?.active ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.5)', border: '1px solid var(--industrial-border)', color: localTheme.promoBanner?.active ? 'white' : 'var(--text-muted)', borderRadius: '4px' }} />
+                </div>
+
+                {/* 4. INFORMAÇÕES DE CONTATO */}
+                <div className="glass-card" style={{ padding: '2rem', gridColumn: '1 / -1' }}>
+                    <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem' }}>4. INFORMAÇÕES DE CONTATO E ENDEREÇO</h4>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>E-MAIL DE ATENDIMENTO</label>
+                            <input type="email" value={localTheme.contactInfo?.email || ''} onChange={(e) => setLocalTheme({...localTheme, contactInfo: {...localTheme.contactInfo, email: e.target.value}})} placeholder="contato@empresa.com.br" style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>NÚMERO DO WHATSAPP (EXIBIÇÃO)</label>
+                            <input type="text" value={localTheme.contactInfo?.whatsapp || ''} onChange={(e) => setLocalTheme({...localTheme, contactInfo: {...localTheme.contactInfo, whatsapp: e.target.value}})} placeholder="(11) 99999-9999" style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>ENDEREÇO (LINHA 1)</label>
+                            <input type="text" value={localTheme.contactInfo?.addressLine1 || ''} onChange={(e) => setLocalTheme({...localTheme, contactInfo: {...localTheme.contactInfo, addressLine1: e.target.value}})} placeholder="Av. Principal, 1000 - Sala 4A" style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>ENDEREÇO (LINHA 2 / CIDADE)</label>
+                            <input type="text" value={localTheme.contactInfo?.addressLine2 || ''} onChange={(e) => setLocalTheme({...localTheme, contactInfo: {...localTheme.contactInfo, addressLine2: e.target.value}})} placeholder="São Paulo - SP" style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} />
+                        </div>
+                    </div>
                 </div>
             </div>
 

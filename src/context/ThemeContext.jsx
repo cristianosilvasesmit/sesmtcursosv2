@@ -8,7 +8,13 @@ export const ThemeProvider = ({ children }) => {
         fontFamily: 'Inter',
         logoUrl: '',
         promoBanner: { active: false, text: 'TREINAMENTOS ONLINE E PRESENCIAIS - INSCRIÇÕES ABERTAS' },
-        socials: { whatsapp: '5541999548422', instagram: '', linkedin: '' }
+        socials: { whatsapp: '5541999548422', instagram: '', linkedin: '' },
+        contactInfo: {
+            whatsapp: '(11) 9999-9999',
+            email: 'cursos@treinamentos.com.br',
+            addressLine1: 'Av. Industrial, 1500 - Sala 402',
+            addressLine2: 'São Paulo - SP'
+        }
     };
 
     const [themeConfig, setThemeConfig] = useState(() => {

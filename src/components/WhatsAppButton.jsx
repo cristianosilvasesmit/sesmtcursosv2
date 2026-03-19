@@ -1,8 +1,13 @@
 import React from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 const WhatsAppButton = () => {
-    // Número de telefone da CSE (exemplo - você pode alterar depois)
-    const phoneNumber = '5541999548422';
+    const { themeConfig } = useTheme();
+    // Pega o WhatsApp formatado ou o fallback
+    const rawNumber = themeConfig?.contactInfo?.whatsapp || '5541999548422';
+    // Remove tudo que não for número (ex: parênteses, traços, espaços)
+    const phoneNumber = rawNumber.replace(/\D/g, '');
+    
     const message = 'Olá! Gostaria de mais informações sobre os treinamentos da CSE.';
 
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
