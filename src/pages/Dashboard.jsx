@@ -303,18 +303,29 @@ const Dashboard = () => {
 
 // Sub-componente para limpar o Dashboard.jsx e facilitar a gestão de estado
 const FinanceiroTab = ({ mpConfig, updateMpConfig, transactions }) => {
-    const [localConfig, setLocalConfig] = useState(mpConfig);
+    const [localMp, setLocalMp] = useState({
+        accessToken: '', // Fica vazio para não exibir o atual por segurança
+        publicKey: mpConfig?.publicKey || '',
+        sandboxMode: mpConfig?.sandboxMode ?? true
+    });
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        setLocalConfig(mpConfig);
+        // Only update publicKey and sandboxMode if mpConfig changes, accessToken is managed separately
+        setLocalMp(prev => ({
+            ...prev,
+            publicKey: mpConfig?.publicKey || '',
+            sandboxMode: mpConfig?.sandboxMode ?? true
+        }));
     }, [mpConfig]);
 
-    const handleSave = async () => {
+    const handleSaveMp = async () => {
         setIsSaving(true);
         try {
-            await updateMpConfig(localConfig);
+            await updateMpConfig(localMp);
             alert("✅ Configurações salvas no Banco de Dados com sucesso!");
+            // Limpa visualmente o access token após salvar por segurança
+            setLocalMp({...localMp, accessToken: ''});
         } catch (err) {
             alert("❌ Erro ao salvar: " + err.message);
         } finally {
@@ -333,28 +344,29 @@ const FinanceiroTab = ({ mpConfig, updateMpConfig, transactions }) => {
                 <div className="glass-card" style={{ padding: '2rem' }}>
                     <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between' }}>
                         API MERCADO PAGO
-                        <span style={{ fontSize: '0.6rem', padding: '0.2rem 0.5rem', background: localConfig.sandboxMode ? '#fbbf24' : '#22c55e', color: 'black', borderRadius: '4px', fontWeight: 900 }}>
-                            {localConfig.sandboxMode ? 'MODO TESTE (SANDBOX)' : 'MODO PRODUÇÃO'}
+                        <span style={{ fontSize: '0.6rem', padding: '0.2rem 0.5rem', background: localMp.sandboxMode ? '#fbbf24' : '#22c55e', color: 'black', borderRadius: '4px', fontWeight: 900 }}>
+                            {localMp.sandboxMode ? 'MODO TESTE (SANDBOX)' : 'MODO PRODUÇÃO'}
                         </span>
                     </h4>
 
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>ACCESS TOKEN</label>
+                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>ACCESS TOKEN (PRODUÇÃO OU SANDBOX)</label>
                         <input
                             type="password"
-                            value={localConfig.accessToken}
-                            onChange={(e) => setLocalConfig({ ...localConfig, accessToken: e.target.value })}
-                            placeholder="APP_USR-..."
-                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--industrial-border)', color: '#22c55e', borderRadius: '4px', fontFamily: 'monospace' }}
+                            value={localMp.accessToken}
+                            onChange={(e) => setLocalMp({ ...localMp, accessToken: e.target.value })}
+                            placeholder="****************************************"
+                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }}
                         />
+                        <span style={{ fontSize: '0.65rem', color: 'var(--accent-yellow)', marginTop: '0.3rem', display: 'block' }}>Por segurança, o token salvo não é exibido. Só preencha se for alterar.</span>
                     </div>
 
                     <div style={{ marginBottom: '1.5rem' }}>
                         <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>CHAVE PÚBLICA (PUBLIC KEY)</label>
                         <input
                             type="text"
-                            value={localConfig.publicKey}
-                            onChange={(e) => setLocalConfig({ ...localConfig, publicKey: e.target.value })}
+                            value={localMp.publicKey}
+                            onChange={(e) => setLocalMp({ ...localMp, publicKey: e.target.value })}
                             placeholder="APP_USR-..."
                             style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }}
                         />
@@ -366,11 +378,11 @@ const FinanceiroTab = ({ mpConfig, updateMpConfig, transactions }) => {
                             <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>Ative para realizar testes sem cobrança real.</div>
                         </div>
                         <div
-                            onClick={() => setLocalConfig({ ...localConfig, sandboxMode: !localConfig.sandboxMode })}
+                            onClick={() => setLocalMp({ ...localMp, sandboxMode: !localMp.sandboxMode })}
                             style={{
                                 width: '50px',
                                 height: '26px',
-                                background: localConfig.sandboxMode ? '#fbbf24' : 'rgba(255,255,255,0.1)',
+                                background: localMp.sandboxMode ? '#fbbf24' : 'rgba(255,255,255,0.1)',
                                 borderRadius: '13px',
                                 position: 'relative',
                                 cursor: 'pointer',
@@ -384,14 +396,14 @@ const FinanceiroTab = ({ mpConfig, updateMpConfig, transactions }) => {
                                 borderRadius: '50%',
                                 position: 'absolute',
                                 top: '3px',
-                                left: localConfig.sandboxMode ? '27px' : '3px',
+                                left: localMp.sandboxMode ? '27px' : '3px',
                                 transition: 'all 0.3s'
                             }}></div>
                         </div>
                     </div>
 
                     <button
-                        onClick={handleSave}
+                        onClick={handleSaveMp}
                         disabled={isSaving}
                         style={{
                             width: '100%',

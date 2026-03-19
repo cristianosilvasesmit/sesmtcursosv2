@@ -19,6 +19,7 @@ import Checkout from './pages/Checkout'
 import Certificate from './pages/Certificate'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import ProtectedRoute from './components/ProtectedRoute'
 
 import { supabase } from './lib/supabaseClient'
 
@@ -59,13 +60,17 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/ead-settings" element={<EADSettings />} />
-        <Route path="/create-course" element={<CourseCreator />} />
-        <Route path="/edit-course/:id" element={<CourseEditor />} />
-        <Route path="/player/:id" element={<CoursePlayer />} />
-        <Route path="/checkout/:id" element={<Checkout />} />
-        <Route path="/certificate/:id" element={<Certificate />} />
+        
+        {/* Rotas Logadas (Alunos e Admins) */}
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/checkout/:id" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+        <Route path="/certificate/:id" element={<ProtectedRoute><Certificate /></ProtectedRoute>} />
+        <Route path="/player/:id" element={<ProtectedRoute><CoursePlayer /></ProtectedRoute>} />
+
+        {/* Rotas Restritas (Apenas Admins) */}
+        <Route path="/ead-settings" element={<ProtectedRoute requireAdmin={true}><EADSettings /></ProtectedRoute>} />
+        <Route path="/create-course" element={<ProtectedRoute requireAdmin={true}><CourseCreator /></ProtectedRoute>} />
+        <Route path="/edit-course/:id" element={<ProtectedRoute requireAdmin={true}><CourseEditor /></ProtectedRoute>} />
       </Routes>
 
       <Footer />
