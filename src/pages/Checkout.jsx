@@ -184,7 +184,13 @@ const Checkout = () => {
                                 </div>
                             ) : (
                                 <div>
-                                    <div id="cardPaymentBrick_container"></div>
+                                    {!mpConfig?.publicKey ? (
+                                        <div style={{ padding: '2rem', textAlign: 'center', color: '#ff4444', border: '1px dashed #ff4444', borderRadius: '8px' }}>
+                                            ⚠️ A Chave Pública (Public Key) do Mercado Pago não está configurada no painel. O formulário de cartão não pode ser carregado.
+                                        </div>
+                                    ) : (
+                                        <div id="cardPaymentBrick_container"></div>
+                                    )}
                                 </div>
                             )}
 
