@@ -27,21 +27,23 @@ function App() {
   const navigate = useNavigate()
 
   React.useEffect(() => {
-    // Verificar se há erro na URL (ex: link expirado)
+    // 1. Verificar se há erro na URL (ex: link expirado)
+    // Com o novo sistema de código (OTP), isso raramente será disparado, 
+    // mas mantemos por segurança para erros globais.
     const hash = window.location.hash
-    if (hash.includes('error_code=otp_expired')) {
-      alert("Este link de recuperação expirou ou já foi usado. Por favor, solicite um novo e-mail.")
-      // Limpa o hash para não repetir o alerta
+    if (hash.includes('error_code=')) {
+      const errorMsg = hash.includes('otp_expired') 
+        ? "Este código ou link expirou. Por favor, solicite um novo."
+        : "Ocorreu um erro na autenticação. Tente novamente.";
+      
+      alert(errorMsg)
       window.history.replaceState(null, null, window.location.pathname)
     }
 
+    // 2. Ouvir mudanças globais de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Radar de Segurança (App.jsx) - Evento:", event)
-
-      if (event === 'PASSWORD_RECOVERY') {
-        console.log("🚀 Link de recuperação detectado! Redirecionando para página de nova senha...")
-        navigate('/reset-password')
-      }
+      // O fluxo de reset agora é manual via ForgotPassword -> ResetPassword
     })
     return () => subscription.unsubscribe()
   }, [navigate])
