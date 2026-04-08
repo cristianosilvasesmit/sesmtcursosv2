@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useTheme } from '../context/ThemeContext'
 
 function Contato() {
+    const { themeConfig } = useTheme();
+    const contactInfo = themeConfig?.contactInfo || {};
+    
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const [status, setStatus] = useState({ loading: false, success: false, error: null });
 
@@ -103,13 +107,13 @@ function Contato() {
                         <div>
                             <div style={{ marginBottom: '3rem' }}>
                                 <h3 style={{ marginBottom: '1rem' }}>ATENDIMENTO DIRETO</h3>
-                                <p style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }}>WhatsApp: (11) 9999-9999</p>
-                                <p style={{ color: 'var(--text-muted)' }}>Email: cursos@treinamentos.com.br</p>
+                                <p style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }}>WhatsApp: {contactInfo.whatsapp || '(11) 9999-9999'}</p>
+                                <p style={{ color: 'var(--text-muted)' }}>Email: {contactInfo.email || 'cursos@treinamentos.com.br'}</p>
                             </div>
                             <div style={{ marginBottom: '3rem' }}>
                                 <h3 style={{ marginBottom: '1rem' }}>NOSSA UNIDADE</h3>
-                                <p style={{ color: 'var(--text-muted)' }}>Av. Industrial, 1500 - Sala 402</p>
-                                <p style={{ color: 'var(--text-muted)' }}>São Paulo - SP</p>
+                                <p style={{ color: 'var(--text-muted)' }}>{contactInfo.addressLine1 || 'Av. Industrial, 1500 - Sala 402'}</p>
+                                <p style={{ color: 'var(--text-muted)' }}>{contactInfo.addressLine2 || 'São Paulo - SP'}</p>
                             </div>
                             <div style={{ height: '200px', background: 'var(--bg-card)', border: '1px solid var(--industrial-border)', borderRadius: '8px', backgroundImage: 'var(--hazard-pattern)', opacity: 0.1 }}></div>
                         </div>

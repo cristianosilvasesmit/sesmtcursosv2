@@ -19,6 +19,7 @@ import Checkout from './pages/Checkout'
 import Certificate from './pages/Certificate'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import ProtectedRoute from './components/ProtectedRoute'
 
 import { supabase } from './lib/supabaseClient'
 
@@ -26,21 +27,23 @@ function App() {
   const navigate = useNavigate()
 
   React.useEffect(() => {
-    // Verificar se há erro na URL (ex: link expirado)
+    // 1. Verificar se há erro na URL (ex: link expirado)
+    // Com o novo sistema de código (OTP), isso raramente será disparado, 
+    // mas mantemos por segurança para erros globais.
     const hash = window.location.hash
-    if (hash.includes('error_code=otp_expired')) {
-      alert("Este link de recuperação expirou ou já foi usado. Por favor, solicite um novo e-mail.")
-      // Limpa o hash para não repetir o alerta
+    if (hash.includes('error_code=')) {
+      const errorMsg = hash.includes('otp_expired') 
+        ? "Este código ou link expirou. Por favor, solicite um novo."
+        : "Ocorreu um erro na autenticação. Tente novamente.";
+      
+      alert(errorMsg)
       window.history.replaceState(null, null, window.location.pathname)
     }
 
+    // 2. Ouvir mudanças globais de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Radar de Segurança (App.jsx) - Evento:", event)
-
-      if (event === 'PASSWORD_RECOVERY') {
-        console.log("🚀 Link de recuperação detectado! Redirecionando para página de nova senha...")
-        navigate('/reset-password')
-      }
+      // O fluxo de reset agora é manual via ForgotPassword -> ResetPassword
     })
     return () => subscription.unsubscribe()
   }, [navigate])
@@ -59,13 +62,17 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/ead-settings" element={<EADSettings />} />
-        <Route path="/create-course" element={<CourseCreator />} />
-        <Route path="/edit-course/:id" element={<CourseEditor />} />
-        <Route path="/player/:id" element={<CoursePlayer />} />
-        <Route path="/checkout/:id" element={<Checkout />} />
-        <Route path="/certificate/:id" element={<Certificate />} />
+        
+        {/* Rotas Logadas (Alunos e Admins) */}
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/checkout/:id" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+        <Route path="/certificate/:id" element={<ProtectedRoute><Certificate /></ProtectedRoute>} />
+        <Route path="/player/:id" element={<ProtectedRoute><CoursePlayer /></ProtectedRoute>} />
+
+        {/* Rotas Restritas (Apenas Admins) */}
+        <Route path="/ead-settings" element={<ProtectedRoute requireAdmin={true}><EADSettings /></ProtectedRoute>} />
+        <Route path="/create-course" element={<ProtectedRoute requireAdmin={true}><CourseCreator /></ProtectedRoute>} />
+        <Route path="/edit-course/:id" element={<ProtectedRoute requireAdmin={true}><CourseEditor /></ProtectedRoute>} />
       </Routes>
 
       <Footer />

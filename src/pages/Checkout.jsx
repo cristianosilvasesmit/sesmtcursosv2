@@ -39,6 +39,18 @@ const Checkout = () => {
         }
     }, [paymentMethod, mp, course, step]);
 
+    const parsePrice = (price) => {
+        if (typeof price === 'number') return price;
+        if (!price) return 0;
+        // Limpeza robusta: "R$ 1.200,50" -> 1200.50
+        const clean = price.toString()
+            .replace('R$', '')
+            .replace(/\./g, '')
+            .replace(',', '.')
+            .trim();
+        return parseFloat(clean) || 0;
+    };
+
     const renderCardBrick = async () => {
         const bricksBuilder = mp.bricks();
 
@@ -48,7 +60,7 @@ const Checkout = () => {
 
         return await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', {
             initialization: {
-                amount: parseFloat(course.price.replace('.', '').replace(',', '.')),
+                amount: parsePrice(course.price),
             },
             customization: {
                 visual: {
@@ -83,8 +95,8 @@ const Checkout = () => {
                     }
                 },
                 onError: (error) => {
-                    console.error("Erro Brick:", error);
-                    alert("Erro ao carregar formulário de cartão.");
+                    console.error("Erro Crítico no Mercado Pago Brick:", error);
+                    alert("Erro ao carregar formulário de cartão. Por favor, verifique se a 'Public Key' nas configurações do painel está correta para o ambiente (Sandbox/Produção) e se começa com 'TEST-' ou 'APP_USR-'.");
                 },
             },
         });
@@ -97,7 +109,7 @@ const Checkout = () => {
         try {
             const result = await processPayment(user, course, {
                 payment_method_id: 'pix',
-                transaction_amount: parseFloat(course.price.replace('.', '').replace(',', '.'))
+                transaction_amount: parsePrice(course.price)
             });
 
             if (result.point_of_interaction?.transaction_data?.qr_code) {
@@ -120,7 +132,7 @@ const Checkout = () => {
         <div style={{ minHeight: '100vh', background: '#f4f4f4', paddingTop: '100px', paddingBottom: '50px', color: '#333' }}>
             <div className="container" style={{ maxWidth: '900px' }}>
                 {step === 'payment' && (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
+                    <div className="checkout-grid">
                         {/* Lado Esquerdo - Detalhes do Pagamento */}
                         <div style={{ background: 'white', padding: '2.5rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2.5rem' }}>
@@ -172,7 +184,13 @@ const Checkout = () => {
                                 </div>
                             ) : (
                                 <div>
-                                    <div id="cardPaymentBrick_container"></div>
+                                    {!mpConfig?.publicKey ? (
+                                        <div style={{ padding: '2rem', textAlign: 'center', color: '#ff4444', border: '1px dashed #ff4444', borderRadius: '8px' }}>
+                                            ⚠️ A Chave Pública (Public Key) do Mercado Pago não está configurada no painel. O formulário de cartão não pode ser carregado.
+                                        </div>
+                                    ) : (
+                                        <div id="cardPaymentBrick_container"></div>
+                                    )}
                                 </div>
                             )}
 
