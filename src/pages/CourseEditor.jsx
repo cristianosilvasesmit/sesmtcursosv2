@@ -7,7 +7,7 @@ const CourseEditor = () => {
     const navigate = useNavigate();
     const { courses, updateCourse } = useCourses();
     const [course, setCourse] = useState(null);
-    const [newLesson, setNewLesson] = useState({ title: '', videoUrl: '', materialUrl: '' });
+    const [newLesson, setNewLesson] = useState({ title: '', videoUrl: '', pandaVideoId: '', materialUrl: '' });
     const [showLessonForm, setShowLessonForm] = useState(false);
 
     useEffect(() => {
@@ -23,7 +23,7 @@ const CourseEditor = () => {
         e.preventDefault();
         const updatedLessons = [...(course.lessons || []), { ...newLesson, id: Date.now().toString() }];
         updateCourse(course.id, { lessons: updatedLessons });
-        setNewLesson({ title: '', videoUrl: '', materialUrl: '' });
+        setNewLesson({ title: '', videoUrl: '', pandaVideoId: '', materialUrl: '' });
         setShowLessonForm(false);
     };
 
@@ -167,15 +167,27 @@ const CourseEditor = () => {
                                 />
                             </div>
 
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>VÍDEO DA AULA</label>
+                             <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>VÍDEO DA AULA (YOUTUBE / MP4)</label>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                     <input
                                         type="text"
                                         placeholder="Cole um link do YouTube ou MP4 direto"
                                         value={newLesson.videoUrl}
-                                        onChange={(e) => setNewLesson({ ...newLesson, videoUrl: e.target.value })}
+                                        onChange={(e) => setNewLesson({ ...newLesson, videoUrl: e.target.value, pandaVideoId: '' })}
                                         style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
+                                    />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <div style={{ flex: 1, height: '1px', background: 'var(--industrial-border)' }}></div>
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>OU PANDA VIDEO ID (RECOMENDADO)</span>
+                                        <div style={{ flex: 1, height: '1px', background: 'var(--industrial-border)' }}></div>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Ex: panda-vz-xxxxx-xxxxx"
+                                        value={newLesson.pandaVideoId}
+                                        onChange={(e) => setNewLesson({ ...newLesson, pandaVideoId: e.target.value, videoUrl: '' })}
+                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
                                     />
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                         <div style={{ flex: 1, height: '1px', background: 'var(--industrial-border)' }}></div>
