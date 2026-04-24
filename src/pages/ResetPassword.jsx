@@ -20,18 +20,20 @@ const ResetPassword = () => {
             const { data: { session } } = await supabase.auth.getSession();
             console.log("Sessão atual no Reset:", session ? "Ativa" : "Nula");
 
-            // O evento onAuthStateChange também ajuda aqui
+            if (session) {
+                setIsReady(true);
+            } else if (window.location.hash.includes('type=recovery')) {
+                // Se não tem sessão mas tem o hash, o Supabase ainda pode processar
+                setIsReady(true);
+            } else {
+                setMessage({ type: 'error', text: 'Sessão de recuperação não encontrada. Por favor, solicite um novo código no e-mail.' });
+            }
+
             const { data: { subscription } } = supabase.auth.onAuthStateChange((event, _session) => {
-                console.log("Evento detectado no ResetPassword:", event);
-                if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && window.location.hash.includes('type=recovery'))) {
+                if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
                     setIsReady(true);
                 }
             });
-
-            // Se já tiver uma sessão e for do tipo recovery ou houver hash de recovery
-            if (session || window.location.hash.includes('type=recovery')) {
-                setIsReady(true);
-            }
 
             return () => subscription.unsubscribe();
         };
@@ -61,12 +63,17 @@ const ResetPassword = () => {
         setMessage({ type: '', text: '' });
 
         try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                throw new Error("Sessão expirada. Por favor, peça um novo código de recuperação.");
+            }
+
             await updatePassword(password);
             setMessage({ type: 'success', text: 'Senha atualizada com sucesso! Você será redirecionado para o login...' });
             setTimeout(() => navigate('/login'), 3000);
         } catch (err) {
-            console.error(err);
-            setMessage({ type: 'error', text: 'Erro ao atualizar senha. O link pode ter expirado.' });
+            console.error("Erro ao atualizar senha:", err);
+            setMessage({ type: 'error', text: err.message || 'Erro ao atualizar senha. Tente novamente.' });
         } finally {
             setIsUpdating(false);
         }

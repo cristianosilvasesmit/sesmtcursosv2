@@ -19,7 +19,7 @@ const ForgotPassword = () => {
 
         try {
             await sendPasswordReset(email);
-            setMessage({ type: 'success', text: 'E-mail enviado! Agora digite o código de 6 dígitos que você recebeu.' });
+            setMessage({ type: 'success', text: 'E-mail enviado! Agora digite o código de 8 dígitos que você recebeu.' });
             setStep('code');
         } catch (err) {
             console.error(err);
@@ -61,7 +61,7 @@ const ForgotPassword = () => {
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
                         {step === 'email'
                             ? 'Enviaremos um código de segurança para seu e-mail'
-                            : `Enviamos um código de 6 dígitos para ${email}`}
+                            : `Enviamos um código de 8 dígitos para ${email}`}
                     </p>
                 </div>
 
@@ -105,15 +105,15 @@ const ForgotPassword = () => {
                 ) : (
                     <form onSubmit={handleVerifyCode}>
                         <div style={{ marginBottom: '2rem' }}>
-                            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem', textTransform: 'uppercase' }}>Código de 6 Dígitos</label>
+                            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem', textTransform: 'uppercase' }}>Código de 8 Dígitos</label>
                             <input
                                 required
                                 type="text"
-                                maxLength="6"
-                                placeholder="000000"
+                                maxLength="8"
+                                placeholder="00000000"
                                 value={token}
                                 onChange={(e) => setToken(e.target.value.replace(/\D/g, ''))}
-                                style={{ width: '100%', padding: '1.2rem', background: 'rgba(255,255,255,0.1)', border: '2px solid var(--accent-yellow)', borderRadius: '4px', color: 'white', outline: 'none', textAlign: 'center', fontSize: '1.5rem', letterSpacing: '0.5rem', fontWeight: 900 }}
+                                style={{ width: '100%', padding: '1.2rem', background: 'rgba(255,255,255,0.1)', border: '2px solid var(--accent-yellow)', borderRadius: '4px', color: 'white', outline: 'none', textAlign: 'center', fontSize: '1.5rem', letterSpacing: '0.3rem', fontWeight: 900 }}
                             />
                         </div>
 

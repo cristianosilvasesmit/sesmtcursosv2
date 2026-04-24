@@ -13,14 +13,20 @@ export const AuthProvider = ({ children }) => {
         const email = sessionUser.email;
         const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
 
-        // Promoção automática se o email for o do dono (case-insensitive)
-        const isOwner = adminEmail && email?.toLowerCase() === adminEmail.toLowerCase();
+        // Ordem de prioridade para definir o cargo:
+        // 1. app_metadata.role (O mais Seguro/Oficial vindo do Banco de Dados)
+        // 2. Verificação de e-mail de dono (VITE_ADMIN_EMAIL)
+        // 3. user_metadata.role (O que foi definido no cadastro)
+        const role = sessionUser.app_metadata?.role || 
+                    (adminEmail && email?.toLowerCase() === adminEmail.toLowerCase() ? 'admin' : null) ||
+                    sessionUser.user_metadata?.role || 
+                    'student';
 
         return {
             id: sessionUser.id,
             email: email,
             name: sessionUser.user_metadata?.full_name || email.split('@')[0],
-            role: isOwner ? 'admin' : (sessionUser.user_metadata?.role || 'student')
+            role: role
         };
     };
 
