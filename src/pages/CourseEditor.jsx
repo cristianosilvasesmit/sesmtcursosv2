@@ -168,40 +168,18 @@ const CourseEditor = () => {
                             </div>
 
                              <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>VÍDEO DA AULA (YOUTUBE / MP4)</label>
+                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>VÍDEO DA AULA (ID PANDA VIDEO)</label>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                                     <input
-                                        type="text"
-                                        placeholder="Cole um link do YouTube ou MP4 direto"
-                                        value={newLesson.videoUrl}
-                                        onChange={(e) => setNewLesson({ ...newLesson, videoUrl: e.target.value, pandaVideoId: '' })}
-                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
-                                    />
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <div style={{ flex: 1, height: '1px', background: 'var(--industrial-border)' }}></div>
-                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>OU PANDA VIDEO ID (RECOMENDADO)</span>
-                                        <div style={{ flex: 1, height: '1px', background: 'var(--industrial-border)' }}></div>
-                                    </div>
-                                    <input
+                                        required
                                         type="text"
                                         placeholder="Ex: panda-vz-xxxxx-xxxxx"
                                         value={newLesson.pandaVideoId}
                                         onChange={(e) => setNewLesson({ ...newLesson, pandaVideoId: e.target.value, videoUrl: '' })}
-                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
+                                        style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white', fontSize: '1.1rem', fontWeight: 900 }}
                                     />
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <div style={{ flex: 1, height: '1px', background: 'var(--industrial-border)' }}></div>
-                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>OU RE-SUBIR ARQUIVO</span>
-                                        <div style={{ flex: 1, height: '1px', background: 'var(--industrial-border)' }}></div>
-                                    </div>
-                                    <input
-                                        type="file"
-                                        accept="video/*"
-                                        onChange={(e) => handleFileUpload(e, 'video')}
-                                        style={{ width: '100%', color: 'var(--text-muted)', fontSize: '0.8rem' }}
-                                    />
+                                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>* Obrigatório para aulas em vídeo. O ID é encontrado no painel do Panda Video.</p>
                                 </div>
-                                {newLesson.videoUrl?.startsWith('blob:') && <div style={{ fontSize: '0.7rem', color: '#22c55e', marginTop: '0.5rem' }}>✓ ARQUIVO LOCAL CARREGADO</div>}
                             </div>
 
                             <div style={{ marginBottom: '2.5rem' }}>

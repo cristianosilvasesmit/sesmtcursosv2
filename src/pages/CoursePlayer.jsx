@@ -106,40 +106,11 @@ const CoursePlayer = () => {
                                         allowFullScreen={true}
                                     ></iframe>
                                 </div>
-                            ) : activeLesson.videoUrl ? (
-                                activeLesson.videoUrl.includes('youtube.com') || activeLesson.videoUrl.includes('youtu.be') ? (
-                                    <iframe
-                                        width="100%"
-                                        height="100%"
-                                        src={`https://www.youtube.com/embed/${activeLesson.videoUrl.split('v=')[1]?.split('&')[0] || activeLesson.videoUrl.split('/').pop()}`}
-                                        title="YouTube video player"
-                                        frameBorder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                        style={{ border: 'none', minHeight: '60vh' }}
-                                    ></iframe>
-                                ) : (
-                                    <div style={{ width: '100%', position: 'relative' }}>
-                                        <video
-                                            key={activeLesson.id}
-                                            controls
-                                            controlsList="nodownload"
-                                            style={{ width: '100%', maxHeight: '80vh' }}
-                                        >
-                                            <source src={activeLesson.videoUrl} type="video/mp4" />
-                                            Seu navegador não suporta o player de vídeo.
-                                        </video>
-                                        {activeLesson.videoUrl.startsWith('blob:') && (
-                                            <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(255,165,0,0.9)', color: 'black', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 900 }}>
-                                                ⚠️ ARQUIVO TEMPORÁRIO (SUMIRÁ AO ATUALIZAR)
-                                            </div>
-                                        )}
-                                    </div>
-                                )
                             ) : (
                                 <div style={{ textAlign: 'center', padding: '2rem' }}>
                                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📺</div>
                                     <h2 style={{ color: 'var(--text-muted)' }}>Vídeo em processamento ou não disponível.</h2>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>O instrutor está subindo este conteúdo para o Panda Video.</p>
                                 </div>
                             )
                         ) : (
