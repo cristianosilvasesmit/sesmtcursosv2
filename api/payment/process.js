@@ -68,6 +68,7 @@ export default async function handler(req, res) {
                     }
                 },
                 external_reference: `${user.id}_${course.id}`, // Muito importante para o Webhook saber quem pagou o quê
+                notification_url: `https://${req.headers.host}/api/webhook/mp`,
             };
 
             const response = await payment.create({ body: pixRequest });
@@ -83,6 +84,7 @@ export default async function handler(req, res) {
                  transaction_amount: Number(payment_data.transaction_amount) || Number(course.price.replace(',','.')),
                  description: `Curso: ${course.title}`,
                  external_reference: `${user.id}_${course.id}`,
+                 notification_url: `https://${req.headers.host}/api/webhook/mp`,
                  payer: {
                      ...payment_data.payer,
                      email: user.email,

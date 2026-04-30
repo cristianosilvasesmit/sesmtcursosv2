@@ -41,22 +41,35 @@ export default async function handler(req, res) {
             if (paymentInfo.status === 'approved') {
                 // A referência externa contém "userId_courseId"
                 const externalReference = paymentInfo.external_reference;
-                if (externalReference) {
+                
+                if (externalReference && externalReference.includes('_')) {
                     const [userId, courseId] = externalReference.split('_');
 
-                    // 3. Insere a matrícula no Supabase
-                    const { error: enrollError } = await supabase
+                    // 3. Verificar se já existe matrícula para evitar duplicidade
+                    const { data: existingEnrollment } = await supabase
                         .from('enrollments')
-                        .insert([
-                            { user_id: userId, course_id: courseId }
-                        ]);
+                        .select('user_id')
+                        .eq('user_id', userId)
+                        .eq('course_id', courseId)
+                        .maybeSingle();
 
-                    if (enrollError) {
-                        console.error('Erro ao matricular usuário:', enrollError);
-                        // Idealmente deveria tentar de novo ou avisar o admin
+                    if (!existingEnrollment) {
+                        const { error: enrollError } = await supabase
+                            .from('enrollments')
+                            .insert([
+                                { user_id: userId, course_id: courseId }
+                            ]);
+
+                        if (enrollError) {
+                            console.error('Erro ao matricular usuário:', enrollError);
+                        } else {
+                            console.log(`Matrícula confirmada! User: ${userId}, Course: ${courseId}`);
+                        }
                     } else {
-                        console.log(`Matrícula confirmada! User: ${userId}, Course: ${courseId}`);
+                        console.log(`Usuário já matriculado: User: ${userId}, Course: ${courseId}`);
                     }
+                } else {
+                    console.error('External Reference inválido ou ausente:', externalReference);
                 }
             }
         }

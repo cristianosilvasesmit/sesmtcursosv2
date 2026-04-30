@@ -21,14 +21,14 @@ export default async function handler(req, res) {
         const { data: settings, error: settingsError } = await supabase
             .from('settings')
             .select('value')
-            .eq('key', 'mercadopago')
+            .eq('key', 'mercadopago_secret')
             .single()
 
-        if (settingsError || !settings?.value?.accessToken) {
+        if (settingsError || !settings?.value?.token) {
             return res.status(500).json({ error: "Configuração MP não encontrada no banco" })
         }
 
-        const accessToken = settings.value.accessToken
+        const accessToken = settings.value.token
 
         // 3. Preparar requisição de pagamento PIX para o Mercado Pago
         // Documentação: https://www.mercadopago.com.br/developers/pt/reference/payments/_payments/post
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
                 first_name: user.name.split(' ')[0],
                 last_name: user.name.split(' ').slice(1).join(' ') || 'Aluno'
             },
-            external_reference: `${user.id}|${course.id}`,
+            external_reference: `${user.id}_${course.id}`,
             notification_url: `https://${req.headers.host}/api/webhook/mp`, // Reutiliza o webhook existente
             installments: 1
         }
