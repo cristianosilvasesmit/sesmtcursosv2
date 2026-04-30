@@ -3,8 +3,8 @@ import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
 
 // Instância única do Supabase para o backend
 // O Vercel injetará essas variáveis automaticamente se configuradas no painel
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
@@ -92,6 +92,15 @@ export default async function handler(req, res) {
              };
 
              const response = await payment.create({ body: cardRequest });
+
+             // Se aprovado na hora (Cartão), já matricula o usuário imediatamente para evitar dependência do webhook
+             if (response.status === 'approved') {
+                 console.log(`[Payment] Pagamento aprovado! Matriculando usuário ${user.id} no curso ${course.id}`);
+                 await supabase
+                     .from('enrollments')
+                     .upsert([{ user_id: user.id, course_id: course.id }], { onConflict: 'user_id,course_id' });
+             }
+
              return res.status(200).json(response);
         }
 

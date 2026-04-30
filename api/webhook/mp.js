@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
@@ -12,10 +12,11 @@ export default async function handler(req, res) {
 
     try {
         const { action, type, data } = req.body;
+        console.log(`[Webhook MP] Recebido: Action=${action}, Type=${type}, ID=${data?.id || req.body.id}`);
 
         // O Mercado Pago manda eventos do tipo "payment" quando há atualização
-        if (action === 'payment.created' || type === 'payment') {
-            const paymentId = data?.id;
+        if (type === 'payment' || action?.startsWith('payment.')) {
+            const paymentId = data?.id || req.body.id;
 
             if (!paymentId) {
                 return res.status(400).json({ error: 'ID do pagamento não fornecido.' });
@@ -37,10 +38,12 @@ export default async function handler(req, res) {
 
             // 2. Busca o pagamento na API oficial para evitar fraudes
             const paymentInfo = await paymentAPI.get({ id: paymentId });
+            console.log(`[Webhook MP] Status do Pagamento ${paymentId}: ${paymentInfo.status}`);
 
             if (paymentInfo.status === 'approved') {
                 // A referência externa contém "userId_courseId"
                 const externalReference = paymentInfo.external_reference;
+                console.log(`[Webhook MP] External Reference: ${externalReference}`);
                 
                 if (externalReference && externalReference.includes('_')) {
                     const [userId, courseId] = externalReference.split('_');
