@@ -12,7 +12,8 @@ const CourseEditor = () => {
     const [newLesson, setNewLesson] = useState({ 
         title: '', 
         pandaVideoId: '', 
-        materialUrl: '' 
+        materialUrl: '',
+        description: '' 
     });
 
     useEffect(() => {
@@ -26,7 +27,7 @@ const CourseEditor = () => {
         e.preventDefault();
         const updatedLessons = [...(course.lessons || []), { ...newLesson, id: Date.now().toString() }];
         updateCourse(course.id, { lessons: updatedLessons });
-        setNewLesson({ title: '', pandaVideoId: '', materialUrl: '' });
+        setNewLesson({ title: '', pandaVideoId: '', materialUrl: '', description: '' });
         setShowLessonForm(false);
     };
 
@@ -120,7 +121,7 @@ const CourseEditor = () => {
                 {/* MODAL NOVA AULA */}
                 {showLessonForm && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
-                        <div className="glass-card" style={{ width: '100%', maxWidth: '500px', padding: '2.5rem' }}>
+                        <div className="glass-card" style={{ width: '100%', maxWidth: '600px', padding: '2.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
                             <h2 style={{ marginBottom: '1.5rem' }}>NOVA AULA</h2>
                             <form onSubmit={handleAddLesson}>
                                 <div style={{ marginBottom: '1rem' }}>
@@ -139,11 +140,22 @@ const CourseEditor = () => {
                                     }} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white' }} />
                                 </div>
 
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>TÓPICOS DA AULA / DESCRIÇÃO</label>
+                                    <textarea 
+                                        rows="4" 
+                                        placeholder="Liste os principais tópicos abordados nesta aula..." 
+                                        value={newLesson.description} 
+                                        onChange={(e) => setNewLesson({ ...newLesson, description: e.target.value })} 
+                                        style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', resize: 'none' }} 
+                                    />
+                                    <p style={{ fontSize: '0.6rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>* Esse texto aparecerá para o aluno na aba "Tópicos da Aula".</p>
+                                </div>
+
                                 <div style={{ marginBottom: '2rem' }}>
                                     <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>PDF DE APOIO (OPCIONAL)</label>
                                     <input type="text" placeholder="URL do PDF" value={newLesson.materialUrl} onChange={(e) => setNewLesson({ ...newLesson, materialUrl: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', marginBottom: '0.5rem' }} />
                                     <input type="file" accept=".pdf" onChange={handleFileUpload} style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }} />
-                                    {newLesson.materialUrl?.startsWith('blob:') && <div style={{ color: '#22c55e', fontSize: '0.65rem', marginTop: '0.4rem' }}>✓ PDF LOCAL CARREGADO</div>}
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '1rem' }}>

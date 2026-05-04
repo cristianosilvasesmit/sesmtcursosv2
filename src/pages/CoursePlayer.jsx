@@ -189,14 +189,8 @@ const CoursePlayer = () => {
 
                         {/* Conteúdo da Aba Ativa */}
                         {activeTab === 'TÓPICOS DA AULA' ? (
-                            <div style={{ color: 'var(--text-muted)', lineHeight: '1.8', fontSize: '0.95rem' }}>
-                                <p style={{ marginBottom: '1rem' }}>Esta lição aborda os procedimentos operacionais padrão para situações críticas.</p>
-                                <ul style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                                    <li>Identificação prematura de riscos operacionais.</li>
-                                    <li>Uso correto dos equipamentos de proteção individual (EPI).</li>
-                                    <li>Protocolos de comunicação em emergências.</li>
-                                    <li>Relatório de incidentes e pós-operação.</li>
-                                </ul>
+                            <div style={{ color: 'var(--text-muted)', lineHeight: '1.8', fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>
+                                {activeLesson?.description || 'Nenhum tópico cadastrado para esta aula.'}
                             </div>
                         ) : (
                             <div>
