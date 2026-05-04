@@ -9,6 +9,7 @@ const CourseEditor = () => {
     
     const [course, setCourse] = useState(null);
     const [showLessonForm, setShowLessonForm] = useState(false);
+    const [editingLessonId, setEditingLessonId] = useState(null);
     const [newLesson, setNewLesson] = useState({ 
         title: '', 
         pandaVideoId: '', 
@@ -23,17 +24,46 @@ const CourseEditor = () => {
 
     if (!course) return <div style={{ color: 'white', padding: '100px', textAlign: 'center' }}>CARREGANDO...</div>;
 
-    const handleAddLesson = (e) => {
+    const handleSaveLesson = (e) => {
         e.preventDefault();
-        const updatedLessons = [...(course.lessons || []), { ...newLesson, id: Date.now().toString() }];
+        
+        let updatedLessons;
+        if (editingLessonId) {
+            // Editando aula existente
+            updatedLessons = course.lessons.map(l => 
+                l.id === editingLessonId ? { ...newLesson, id: editingLessonId } : l
+            );
+        } else {
+            // Adicionando nova aula
+            updatedLessons = [...(course.lessons || []), { ...newLesson, id: Date.now().toString() }];
+        }
+
         updateCourse(course.id, { lessons: updatedLessons });
+        resetForm();
+    };
+
+    const resetForm = () => {
         setNewLesson({ title: '', pandaVideoId: '', materialUrl: '', description: '' });
+        setEditingLessonId(null);
         setShowLessonForm(false);
     };
 
+    const handleEditLesson = (lesson) => {
+        setNewLesson({
+            title: lesson.title,
+            pandaVideoId: lesson.pandaVideoId || '',
+            materialUrl: lesson.materialUrl || '',
+            description: lesson.description || ''
+        });
+        setEditingLessonId(lesson.id);
+        setShowLessonForm(true);
+    };
+
     const handleDeleteLesson = (lessonId) => {
-        const updatedLessons = course.lessons.filter(l => l.id !== lessonId);
-        updateCourse(course.id, { lessons: updatedLessons });
+        if (window.confirm("Deseja excluir esta aula?")) {
+            const updatedLessons = course.lessons.filter(l => l.id !== lessonId);
+            updateCourse(course.id, { lessons: updatedLessons });
+        }
     };
 
     const handleFileUpload = (e) => {
@@ -61,7 +91,7 @@ const CourseEditor = () => {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                             <h2 style={{ fontSize: '1.2rem' }}>PLAYLIST DE AULAS</h2>
                             <button 
-                                onClick={() => setShowLessonForm(true)}
+                                onClick={() => { resetForm(); setShowLessonForm(true); }}
                                 style={{ background: 'var(--accent-yellow)', color: 'black', padding: '0.6rem 1.2rem', fontWeight: 900, borderRadius: '4px', border: 'none', cursor: 'pointer' }}
                             >
                                 + NOVA AULA
@@ -81,7 +111,10 @@ const CourseEditor = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onClick={() => handleDeleteLesson(lesson.id)} style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', fontWeight: 700 }}>EXCLUIR</button>
+                                        <div style={{ display: 'flex', gap: '1rem' }}>
+                                            <button onClick={() => handleEditLesson(lesson)} style={{ background: 'transparent', border: 'none', color: 'var(--accent-yellow)', cursor: 'pointer', fontWeight: 700, fontSize: '0.7rem' }}>EDITAR</button>
+                                            <button onClick={() => handleDeleteLesson(lesson.id)} style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', fontWeight: 700, fontSize: '0.7rem' }}>EXCLUIR</button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -118,12 +151,12 @@ const CourseEditor = () => {
                     </div>
                 </div>
 
-                {/* MODAL NOVA AULA */}
+                {/* MODAL NOVA/EDITAR AULA */}
                 {showLessonForm && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
                         <div className="glass-card" style={{ width: '100%', maxWidth: '600px', padding: '2.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
-                            <h2 style={{ marginBottom: '1.5rem' }}>NOVA AULA</h2>
-                            <form onSubmit={handleAddLesson}>
+                            <h2 style={{ marginBottom: '1.5rem' }}>{editingLessonId ? 'EDITAR AULA' : 'NOVA AULA'}</h2>
+                            <form onSubmit={handleSaveLesson}>
                                 <div style={{ marginBottom: '1rem' }}>
                                     <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>TÍTULO DA AULA</label>
                                     <input required type="text" placeholder="Ex: Primeiros Passos" value={newLesson.title} onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white' }} />
@@ -149,7 +182,6 @@ const CourseEditor = () => {
                                         onChange={(e) => setNewLesson({ ...newLesson, description: e.target.value })} 
                                         style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', resize: 'none' }} 
                                     />
-                                    <p style={{ fontSize: '0.6rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>* Esse texto aparecerá para o aluno na aba "Tópicos da Aula".</p>
                                 </div>
 
                                 <div style={{ marginBottom: '2rem' }}>
@@ -159,8 +191,8 @@ const CourseEditor = () => {
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <button type="button" onClick={() => setShowLessonForm(false)} style={{ flex: 1, padding: '1rem', background: 'transparent', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }}>CANCELAR</button>
-                                    <button type="submit" style={{ flex: 1, padding: '1rem', background: 'var(--primary-red)', border: 'none', color: 'white', fontWeight: 900, borderRadius: '4px' }}>SALVAR</button>
+                                    <button type="button" onClick={resetForm} style={{ flex: 1, padding: '1rem', background: 'transparent', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }}>CANCELAR</button>
+                                    <button type="submit" style={{ flex: 1, padding: '1rem', background: 'var(--primary-red)', border: 'none', color: 'white', fontWeight: 900, borderRadius: '4px' }}>{editingLessonId ? 'SALVAR ALTERAÇÕES' : 'ADICIONAR AULA'}</button>
                                 </div>
                             </form>
                         </div>
