@@ -180,7 +180,7 @@ const Dashboard = () => {
                     )}
 
                     {/* Navigation Tabs (Visível para todos) */}
-                    <div className="dash-tabs" style={{ display: 'flex', overflowX: 'auto', gap: '10px', paddingBottom: '10px', borderBottom: '1px solid var(--industrial-border)' }}>
+                    <div className="dash-tabs">
                         {(user?.role === 'admin' ? [
                             { id: 'cursos', label: 'GESTÃO DE CURSOS', icon: '📚' },
                             { id: 'alunos', label: 'ALUNOS & MATRÍCULAS', icon: '👥' },

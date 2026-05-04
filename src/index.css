@@ -222,17 +222,23 @@ button {
 
 .dash-tabs {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
   border-bottom: 1px solid var(--industrial-border);
-  padding-bottom: 1px;
   overflow-x: auto;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: 5px; /* Espaço para o indicador de aba ativa */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
 }
 
 .dash-tabs::-webkit-scrollbar {
-  display: none;
+  display: none; /* Chrome/Safari */
+}
+
+.tab-btn {
+  flex-shrink: 0; /* Impede que os botões diminuam de tamanho no scroll */
 }
 
 .dash-section-header {
