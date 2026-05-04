@@ -158,9 +158,9 @@ const Dashboard = () => {
                     </button>
                 </div>
 
-                {user?.role === 'admin' && (
-                    <>
-                        {/* KPIs - Command Center Metrics */}
+                {/* KPIs e Tabs */}
+                <div style={{ marginBottom: '3rem' }}>
+                    {user?.role === 'admin' && (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
                             {[
                                 { label: 'TOTAL ALUNOS', value: stats.totalAlunos, color: '#3b82f6', icon: '👥' },
@@ -177,41 +177,46 @@ const Dashboard = () => {
                                 </div>
                             ))}
                         </div>
+                    )}
 
-                        {/* Navigation Tabs */}
-                        <div className="dash-tabs">
-                            {[
-                                { id: 'cursos', label: 'GESTÃO DE CURSOS', icon: '📚' },
-                                { id: 'alunos', label: 'ALUNOS & MATRÍCULAS', icon: '👥' },
-                                { id: 'leads', label: 'CENTRAL DE LEADS', icon: '🎯' },
-                                { id: 'interface', label: 'INTERFACE / PERSONALIZAÇÃO', icon: '🎨' },
-                                { id: 'financeiro', label: 'FINANCEIRO / MERCADO PAGO', icon: '💰' }
-                            ].map(tab => (
-                                <button
-                                    key={tab.id}
-                                    className="tab-btn"
-                                    onClick={() => setActiveTab(tab.id)}
-                                    style={{
-                                        padding: '1rem 1.5rem',
-                                        background: activeTab === tab.id ? 'rgba(255,255,255,0.05)' : 'transparent',
-                                        border: 'none',
-                                        borderBottom: activeTab === tab.id ? '3px solid var(--primary-red)' : '3px solid transparent',
-                                        color: activeTab === tab.id ? 'white' : 'var(--text-muted)',
-                                        fontWeight: 900,
-                                        fontSize: '0.75rem',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px'
-                                    }}
-                                >
-                                    <span>{tab.icon}</span> {tab.label}
-                                </button>
-                            ))}
-                        </div>
-                    </>
-                )}
+                    {/* Navigation Tabs (Visível para todos) */}
+                    <div className="dash-tabs" style={{ display: 'flex', overflowX: 'auto', gap: '10px', paddingBottom: '10px', borderBottom: '1px solid var(--industrial-border)' }}>
+                        {(user?.role === 'admin' ? [
+                            { id: 'cursos', label: 'GESTÃO DE CURSOS', icon: '📚' },
+                            { id: 'alunos', label: 'ALUNOS & MATRÍCULAS', icon: '👥' },
+                            { id: 'leads', label: 'CENTRAL DE LEADS', icon: '🎯' },
+                            { id: 'interface', label: 'INTERFACE / PERSONALIZAÇÃO', icon: '🎨' },
+                            { id: 'financeiro', label: 'FINANCEIRO / MERCADO PAGO', icon: '💰' },
+                            { id: 'perfil', label: 'MEU PERFIL', icon: '👤' }
+                        ] : [
+                            { id: 'cursos', label: 'MEUS CURSOS', icon: '📚' },
+                            { id: 'perfil', label: 'MEU PERFIL', icon: '👤' }
+                        ]).map(tab => (
+                            <button
+                                key={tab.id}
+                                className="tab-btn"
+                                onClick={() => setActiveTab(tab.id)}
+                                style={{
+                                    padding: '1rem 1.5rem',
+                                    background: activeTab === tab.id ? 'rgba(255,255,255,0.05)' : 'transparent',
+                                    border: 'none',
+                                    borderBottom: activeTab === tab.id ? '3px solid var(--primary-red)' : '3px solid transparent',
+                                    color: activeTab === tab.id ? 'white' : 'var(--text-muted)',
+                                    fontWeight: 900,
+                                    fontSize: '0.75rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                <span>{tab.icon}</span> {tab.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Conteúdo Dinâmico por Aba */}
                 {activeTab === 'cursos' && (
@@ -295,6 +300,10 @@ const Dashboard = () => {
                         updateMpConfig={updateMpConfig}
                         transactions={transactions}
                     />
+                )}
+
+                {activeTab === 'perfil' && (
+                    <PerfilTab />
                 )}
             </div>
         </div>
@@ -753,6 +762,169 @@ const InterfaceTab = ({ themeConfig, updateTheme, changeThemeColor, primaryColor
             </div>
 
             <button onClick={handleSave} style={{ width: '100%', marginTop: '2rem', padding: '1.2rem', background: 'var(--primary-red)', color: 'white', fontWeight: 900, border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1.1rem', boxShadow: '0 4px 15px rgba(255,0,0,0.3)' }}>APLICAR E SALVAR ALTERAÇÕES</button>
+        </div>
+    );
+};
+
+const PerfilTab = () => {
+    const { user, updateProfile, updatePassword } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [profileData, setProfileData] = useState({
+        full_name: '',
+        phone: '',
+        avatar_url: ''
+    });
+    const [passwords, setPasswords] = useState({
+        new: '',
+        confirm: ''
+    });
+
+    useEffect(() => {
+        if (user) {
+            // Carregar dados extras do perfil no Supabase
+            const fetchProfile = async () => {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('full_name, phone, avatar_url')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (!error && data) {
+                    setProfileData({
+                        full_name: data.full_name || user.name || '',
+                        phone: data.phone || '',
+                        avatar_url: data.avatar_url || ''
+                    });
+                } else {
+                    setProfileData(prev => ({ ...prev, full_name: user.name }));
+                }
+            };
+            fetchProfile();
+        }
+    }, [user]);
+
+    const handleUpdateProfile = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            await updateProfile(profileData);
+            alert("✅ Perfil atualizado com sucesso!");
+        } catch (err) {
+            alert("❌ Erro ao atualizar perfil: " + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdatePassword = async (e) => {
+        e.preventDefault();
+        if (passwords.new !== passwords.confirm) return alert("As senhas não coincidem!");
+        if (passwords.new.length < 6) return alert("A senha deve ter no mínimo 6 caracteres!");
+
+        setLoading(true);
+        try {
+            await updatePassword(passwords.new);
+            alert("✅ Senha alterada com sucesso!");
+            setPasswords({ new: '', confirm: '' });
+        } catch (err) {
+            alert("❌ Erro ao alterar senha: " + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+            {/* Dados Pessoais */}
+            <div className="glass-card" style={{ padding: '2rem', border: '1px solid var(--industrial-border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                    <div style={{ fontSize: '1.5rem' }}>👤</div>
+                    <h3 style={{ color: 'white' }}>DADOS PESSOAIS</h3>
+                </div>
+
+                <form onSubmit={handleUpdateProfile}>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>NOME COMPLETO (USADO NO CERTIFICADO)</label>
+                        <input 
+                            type="text" 
+                            required
+                            value={profileData.full_name} 
+                            onChange={(e) => setProfileData({...profileData, full_name: e.target.value.toUpperCase()})} 
+                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} 
+                        />
+                    </div>
+
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>WHATSAPP / TELEFONE</label>
+                        <input 
+                            type="text" 
+                            placeholder="(00) 00000-0000"
+                            value={profileData.phone} 
+                            onChange={(e) => setProfileData({...profileData, phone: e.target.value})} 
+                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} 
+                        />
+                    </div>
+
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>URL DA FOTO DE PERFIL (OPCIONAL)</label>
+                        <input 
+                            type="text" 
+                            placeholder="https://..."
+                            value={profileData.avatar_url} 
+                            onChange={(e) => setProfileData({...profileData, avatar_url: e.target.value})} 
+                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} 
+                        />
+                    </div>
+
+                    <button disabled={loading} type="submit" style={{ width: '100%', padding: '1rem', background: 'var(--primary-red)', color: 'white', fontWeight: 900, border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                        {loading ? 'SALVANDO...' : 'ATUALIZAR MEUS DADOS'}
+                    </button>
+                </form>
+            </div>
+
+            {/* Segurança */}
+            <div className="glass-card" style={{ padding: '2rem', border: '1px solid var(--industrial-border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                    <div style={{ fontSize: '1.5rem' }}>🔒</div>
+                    <h3 style={{ color: 'white' }}>SEGURANÇA DA CONTA</h3>
+                </div>
+
+                <form onSubmit={handleUpdatePassword}>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>NOVA SENHA</label>
+                        <input 
+                            type="password" 
+                            required
+                            value={passwords.new} 
+                            onChange={(e) => setPasswords({...passwords, new: e.target.value})} 
+                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} 
+                        />
+                    </div>
+
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>CONFIRMAR NOVA SENHA</label>
+                        <input 
+                            type="password" 
+                            required
+                            value={passwords.confirm} 
+                            onChange={(e) => setPasswords({...passwords, confirm: e.target.value})} 
+                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }} 
+                        />
+                    </div>
+
+                    <button disabled={loading} type="submit" style={{ width: '100%', padding: '1rem', background: 'white', color: 'black', fontWeight: 900, border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                        {loading ? 'ALTERANDO...' : 'ALTERAR MINHA SENHA'}
+                    </button>
+                </form>
+
+                <div style={{ marginTop: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '4px', borderLeft: '3px solid var(--accent-yellow)' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        Seu e-mail de acesso é: <br/>
+                        <strong style={{ color: 'white' }}>{user?.email}</strong><br/><br/>
+                        Para trocar o e-mail, entre em contato com o suporte.
+                    </p>
+                </div>
+            </div>
         </div>
     );
 };

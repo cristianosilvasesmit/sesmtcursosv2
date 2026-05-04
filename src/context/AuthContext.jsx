@@ -107,8 +107,43 @@ export const AuthProvider = ({ children }) => {
         return data;
     };
 
+    const updateProfile = async (updates) => {
+        if (!user || !user.id) return;
+        
+        // 1. Atualizar no Supabase Auth (user_metadata)
+        const { data, error } = await supabase.auth.updateUser({
+            data: {
+                full_name: updates.full_name,
+                avatar_url: updates.avatar_url,
+                phone: updates.phone
+            }
+        });
+        if (error) throw error;
+
+        // 2. Sincronizar com a tabela de perfis pública/privada
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .update({
+                full_name: updates.full_name,
+                avatar_url: updates.avatar_url,
+                phone: updates.phone
+            })
+            .eq('id', user.id);
+        
+        if (profileError) console.error("Erro ao sincronizar perfil no banco:", profileError);
+
+        // Atualiza estado local para refletir na UI imediatamente
+        setUser(prev => ({ 
+            ...prev, 
+            name: updates.full_name || prev.name,
+            avatar_url: updates.avatar_url || prev.avatar_url
+        }));
+
+        return data;
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, signup, logout, loading, sendPasswordReset, updatePassword, verifyResetCode }}>
+        <AuthContext.Provider value={{ user, login, signup, logout, loading, sendPasswordReset, updatePassword, verifyResetCode, updateProfile }}>
             {!loading && children}
         </AuthContext.Provider>
     );
