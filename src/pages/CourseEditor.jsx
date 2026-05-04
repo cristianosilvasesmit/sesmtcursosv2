@@ -86,89 +86,43 @@ const CourseEditor = () => {
                                 Nenhuma aula cadastrada ainda.
                             </div>
                         )}
-                    </div> {/* FECHA COLUNA 1 (O erro estava aqui!) */}
+                    </div>
 
                     {/* COLUNA 2: DADOS DO CURSO */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                        {/* Capa */}
                         <div className="glass-card" style={{ padding: '2rem' }}>
-                            <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>CAPA DO CURSO</h3>
+                            <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>CAPA E DADOS</h3>
                             <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
                                 <img src={course.image} alt="Capa" style={{ width: '100%', borderRadius: '4px', border: '1px solid var(--industrial-border)' }} />
-                                <label
-                                    htmlFor="hero-upload"
-                                    style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'var(--primary-red)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}
-                                >
-                                    ALTERAR FOTO
-                                </label>
-                                <input
-                                    id="hero-upload"
-                                    type="file"
-                                    accept="image/*"
-                                    style={{ display: 'none' }}
-                                    onChange={(e) => {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                            const reader = new FileReader();
-                                            reader.onloadend = () => updateCourse(course.id, { image: reader.result });
-                                            reader.readAsDataURL(file);
-                                        }
-                                    }}
-                                />
+                                <label htmlFor="hero-upload" style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'var(--primary-red)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}>ALTERAR FOTO</label>
+                                <input id="hero-upload" type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => updateCourse(course.id, { image: reader.result });
+                                        reader.readAsDataURL(file);
+                                    }
+                                }} />
                             </div>
-                            <input
-                                type="text"
-                                placeholder="URL da Imagem"
-                                value={course.image?.startsWith('data:') ? '' : course.image}
-                                onChange={(e) => updateCourse(course.id, { image: e.target.value })}
-                                style={{ width: '100%', padding: '0.6rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
-                            />
-                        </div>
-
-                        {/* Dados Gerais */}
-                        <div className="glass-card" style={{ padding: '2rem' }}>
-                            <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>DADOS GERAIS</h3>
+                            
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                                 <div>
                                     <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>TÍTULO</label>
                                     <input type="text" value={course.title} onChange={(e) => updateCourse(course.id, { title: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontWeight: 700 }} />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div>
-                                        <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>CATEGORIA</label>
-                                        <input type="text" value={course.category} onChange={(e) => updateCourse(course.id, { category: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }} />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>PREÇO (R$)</label>
-                                        <input type="text" value={course.price} onChange={(e) => updateCourse(course.id, { price: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem', fontWeight: 700 }} />
-                                    </div>
-                                </div>
                                 <div>
-                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>DESCRIÇÃO</label>
-                                    <textarea rows="4" value={course.description} onChange={(e) => updateCourse(course.id, { description: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem', resize: 'none' }} />
+                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>PREÇO (R$)</label>
+                                    <input type="text" value={course.price} onChange={(e) => updateCourse(course.id, { price: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontWeight: 700 }} />
+                                </div>
+                                <div className="glass-card" style={{ padding: '1.5rem', border: '1px solid rgba(255, 68, 68, 0.3)', marginTop: '1rem' }}>
+                                    <button onClick={async () => { if (window.confirm("⚠️ EXCLUIR CURSO?")) { await deleteCourse(course.id); navigate('/dashboard'); } }} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255, 68, 68, 0.1)', color: '#ff4444', border: '1px solid #ff4444', borderRadius: '4px', fontWeight: 900, cursor: 'pointer' }}>EXCLUIR CURSO</button>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Zona de Perigo */}
-                        <div className="glass-card" style={{ padding: '2rem', border: '1px solid rgba(255, 68, 68, 0.3)' }}>
-                            <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: '#ff4444' }}>ZONA DE PERIGO</h3>
-                            <button 
-                                onClick={async () => {
-                                    if (window.confirm("⚠️ EXCLUIR ESTE CURSO PERMANENTEMENTE?")) {
-                                        await deleteCourse(course.id);
-                                        navigate('/dashboard');
-                                    }
-                                }}
-                                style={{ width: '100%', padding: '0.8rem', background: 'rgba(255, 68, 68, 0.1)', color: '#ff4444', border: '1px solid #ff4444', borderRadius: '4px', fontWeight: 900, cursor: 'pointer' }}
-                            >
-                                EXCLUIR CURSO
-                            </button>
-                        </div>
                     </div>
-                </div> {/* FECHA GRID */}
+                </div>
 
-                {/* MODAL DE NOVA AULA */}
+                {/* MODAL NOVA AULA */}
                 {showLessonForm && (
                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
                         <div className="glass-card" style={{ width: '100%', maxWidth: '500px', padding: '2rem' }}>
