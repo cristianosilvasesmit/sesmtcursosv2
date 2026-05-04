@@ -5,7 +5,7 @@ import { useCourses } from '../context/CourseContext';
 const CourseEditor = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { courses, updateCourse } = useCourses();
+    const { courses, updateCourse, deleteCourse } = useCourses();
     const [course, setCourse] = useState(null);
     const [newLesson, setNewLesson] = useState({ title: '', videoUrl: '', pandaVideoId: '', materialUrl: '' });
     const [showLessonForm, setShowLessonForm] = useState(false);
@@ -35,7 +35,6 @@ const CourseEditor = () => {
     const handleFileUpload = (e, type) => {
         const file = e.target.files[0];
         if (file) {
-            // Simulação de upload local
             const url = URL.createObjectURL(file);
             if (type === 'video') setNewLesson({ ...newLesson, videoUrl: url });
             if (type === 'pdf') setNewLesson({ ...newLesson, materialUrl: url });
@@ -53,7 +52,7 @@ const CourseEditor = () => {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
-                    {/* Lista de Aulas */}
+                    {/* Coluna 1: Playlist */}
                     <div className="glass-card" style={{ padding: '2rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                             <h2 style={{ fontSize: '1.5rem' }}>PLAYLIST DO CURSO</h2>
@@ -74,7 +73,7 @@ const CourseEditor = () => {
                                             <div>
                                                 <div style={{ fontWeight: 700 }}>{lesson.title}</div>
                                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                                    {lesson.videoUrl ? '🎥 VÍDEO PRONTO' : '⚠️ SEM VÍDEO'} | {lesson.materialUrl ? '📑 PDF PRONTO' : '⚠️ SEM PDF'}
+                                                    {lesson.videoUrl || lesson.pandaVideoId ? '🎥 VÍDEO PRONTO' : '⚠️ SEM VÍDEO'} | {lesson.materialUrl ? '📑 PDF PRONTO' : '⚠️ SEM PDF'}
                                                 </div>
                                             </div>
                                         </div>
@@ -84,19 +83,21 @@ const CourseEditor = () => {
                             </div>
                         ) : (
                             <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)', border: '2px dashed var(--industrial-border)', borderRadius: '8px' }}>
-                                Nenhuma aula cadastrada ainda. Comece adicionando o conteúdo acima.
+                                Nenhuma aula cadastrada ainda.
                             </div>
                         )}
-                        {/* Dados e Configurações do Curso */}
+                    </div>
+
+                    {/* Coluna 2: Configurações */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                         {/* Capa */}
-                        <div className="glass-card" style={{ padding: '2rem', height: 'fit-content' }}>
+                        <div className="glass-card" style={{ padding: '2rem' }}>
                             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>CAPA DO CURSO</h3>
                             <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
                                 <img src={course.image} alt="Capa" style={{ width: '100%', borderRadius: '4px', border: '1px solid var(--industrial-border)' }} />
                                 <label
                                     htmlFor="hero-upload"
-                                    style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'var(--primary-red)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}
+                                    style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'var(--primary-red)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}
                                 >
                                     ALTERAR FOTO
                                 </label>
@@ -109,188 +110,81 @@ const CourseEditor = () => {
                                         const file = e.target.files[0];
                                         if (file) {
                                             const reader = new FileReader();
-                                            reader.onloadend = () => {
-                                                updateCourse(course.id, { image: reader.result });
-                                            };
+                                            reader.onloadend = () => updateCourse(course.id, { image: reader.result });
                                             reader.readAsDataURL(file);
                                         }
                                     }}
                                 />
                             </div>
-                            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.5rem' }}>OU URL DA IMAGEM</label>
                             <input
                                 type="text"
+                                placeholder="URL da Imagem"
                                 value={course.image?.startsWith('data:') ? '' : course.image}
                                 onChange={(e) => updateCourse(course.id, { image: e.target.value })}
                                 style={{ width: '100%', padding: '0.6rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
                             />
                         </div>
 
-                        {/* Dados Principais */}
+                        {/* Dados Gerais */}
                         <div className="glass-card" style={{ padding: '2rem' }}>
                             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>DADOS GERAIS</h3>
-                            
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                                 <div>
-                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>TÍTULO DO CURSO</label>
-                                    <input
-                                        type="text"
-                                        value={course.title}
-                                        onChange={(e) => updateCourse(course.id, { title: e.target.value.toUpperCase() })}
-                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.9rem', fontWeight: 700 }}
-                                    />
+                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>TÍTULO</label>
+                                    <input type="text" value={course.title} onChange={(e) => updateCourse(course.id, { title: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontWeight: 700 }} />
                                 </div>
-
                                 <div>
-                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>CATEGORIA</label>
-                                    <input
-                                        type="text"
-                                        value={course.category}
-                                        onChange={(e) => updateCourse(course.id, { category: e.target.value })}
-                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
-                                    />
+                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>PREÇO (R$)</label>
+                                    <input type="text" value={course.price} onChange={(e) => updateCourse(course.id, { price: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontWeight: 700 }} />
                                 </div>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div>
-                                        <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>DURAÇÃO</label>
-                                        <input
-                                            type="text"
-                                            value={course.duration}
-                                            onChange={(e) => updateCourse(course.id, { duration: e.target.value })}
-                                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>PREÇO (R$)</label>
-                                        <input
-                                            type="text"
-                                            value={course.price}
-                                            onChange={(e) => updateCourse(course.id, { price: e.target.value })}
-                                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem', fontWeight: 700 }}
-                                        />
-                                    </div>
-                                </div>
-
                                 <div>
-                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>DESCRIÇÃO DO CURSO</label>
-                                    <textarea
-                                        rows="4"
-                                        value={course.description}
-                                        onChange={(e) => updateCourse(course.id, { description: e.target.value })}
-                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem', resize: 'none' }}
-                                    />
-                                </div>
-
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginTop: '1rem', padding: '1rem', background: 'rgba(34, 197, 94, 0.1)', borderRadius: '4px', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
-                                    <span style={{ color: '#22c55e', fontWeight: 700 }}>● CURSO PUBLICADO</span>
-                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>Sincronizado com Supabase</span>
+                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>DESCRIÇÃO</label>
+                                    <textarea rows="4" value={course.description} onChange={(e) => updateCourse(course.id, { description: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', resize: 'none' }} />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Zona de Perigo */}
+                        {/* Perigo */}
                         <div className="glass-card" style={{ padding: '2rem', border: '1px solid rgba(255, 68, 68, 0.3)' }}>
                             <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: '#ff4444' }}>ZONA DE PERIGO</h3>
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                                A exclusão do curso é permanente e removerá todas as aulas vinculadas.
-                            </p>
                             <button 
                                 onClick={async () => {
-                                    if (window.confirm("⚠️ ATENÇÃO: Você tem certeza que deseja EXCLUIR PERMANENTEMENTE este curso e todas as suas aulas? Esta ação não pode ser desfeita.")) {
+                                    if (window.confirm("⚠️ EXCLUIR ESTE CURSO PERMANENTEMENTE?")) {
                                         await deleteCourse(course.id);
                                         navigate('/dashboard');
                                     }
                                 }}
-                                style={{ width: '100%', padding: '0.8rem', background: 'rgba(255, 68, 68, 0.1)', color: '#ff4444', border: '1px solid #ff4444', borderRadius: '4px', fontWeight: 900, cursor: 'pointer', transition: 'all 0.3s' }}
-                                onMouseOver={(e) => e.target.style.background = '#ff4444' }
-                                onMouseOut={(e) => e.target.style.background = 'rgba(255, 68, 68, 0.1)' }
-                                onMouseEnter={(e) => e.target.style.color = 'white'}
-                                onMouseLeave={(e) => e.target.style.color = '#ff4444'}
+                                style={{ width: '100%', padding: '0.8rem', background: 'rgba(255, 68, 68, 0.1)', color: '#ff4444', border: '1px solid #ff4444', borderRadius: '4px', fontWeight: 900, cursor: 'pointer' }}
                             >
-                                EXCLUIR CURSO PERMANENTEMENTE
+                                EXCLUIR CURSO
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Modal de Nova Aula */}
-            {showLessonForm && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
-                    <div className="glass-card" style={{ width: '100%', maxWidth: '600px', padding: '3rem' }}>
-                        <h2 style={{ marginBottom: '2rem' }}>NOVA <span style={{ color: 'var(--primary-red)' }}>AULA</span></h2>
-                        <form onSubmit={handleAddLesson}>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>TÍTULO DA AULA</label>
-                                <input
-                                    required
-                                    type="text"
-                                    placeholder="Ex: Primeiros Passos no Resgate"
-                                    value={newLesson.title}
-                                    onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value.toUpperCase() })}
-                                    style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white' }}
-                                />
-                            </div>
-
-                             <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>VÍDEO DA AULA (ID PANDA VIDEO)</label>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                                    <input
-                                        required
-                                        type="text"
-                                        placeholder="Ex: panda-vz-xxxxx-xxxxx"
-                                        value={newLesson.pandaVideoId}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            let finalId = val;
-                                            
-                                            // Se o usuário colou o iframe inteiro ou uma URL, extraímos apenas o ID (v=...)
-                                            if (val.includes('v=')) {
-                                                const match = val.match(/v=([a-zA-Z0-9-]+)/);
-                                                if (match && match[1]) finalId = match[1];
-                                            } else if (val.includes('<iframe')) {
-                                                // Caso cole o iframe mas o regex acima falhe por algum motivo
-                                                const match = val.match(/embed\/\?v=([a-zA-Z0-9-]+)/);
-                                                if (match && match[1]) finalId = match[1];
-                                            }
-
-                                            setNewLesson({ ...newLesson, pandaVideoId: finalId, videoUrl: '' });
-                                        }}
-                                        style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white', fontSize: '1.1rem', fontWeight: 900 }}
-                                    />
-                                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>* Obrigatório para aulas em vídeo. O ID é encontrado no painel do Panda Video.</p>
+                {/* Modal Nova Aula */}
+                {showLessonForm && (
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+                        <div className="glass-card" style={{ width: '100%', maxWidth: '500px', padding: '2rem' }}>
+                            <h2 style={{ marginBottom: '1.5rem' }}>NOVA AULA</h2>
+                            <form onSubmit={handleAddLesson}>
+                                <input required type="text" placeholder="TÍTULO" value={newLesson.title} onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', marginBottom: '1rem' }} />
+                                <input required type="text" placeholder="ID PANDA VIDEO" value={newLesson.pandaVideoId} onChange={(e) => {
+                                    const val = e.target.value;
+                                    let finalId = val;
+                                    if (val.includes('v=')) finalId = val.match(/v=([a-zA-Z0-9-]+)/)?.[1] || val;
+                                    else if (val.includes('<iframe')) finalId = val.match(/embed\/\?v=([a-zA-Z0-9-]+)/)?.[1] || val;
+                                    setNewLesson({ ...newLesson, pandaVideoId: finalId });
+                                }} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white', marginBottom: '1rem' }} />
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                                    <button type="button" onClick={() => setShowLessonForm(false)} style={{ flex: 1, padding: '1rem', background: 'transparent', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }}>CANCELAR</button>
+                                    <button type="submit" style={{ flex: 1, padding: '1rem', background: 'var(--primary-red)', border: 'none', color: 'white', fontWeight: 900, borderRadius: '4px' }}>SALVAR</button>
                                 </div>
-                            </div>
-
-                            <div style={{ marginBottom: '2.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>PDF DE APOIO (OPCIONAL)</label>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                                    <input
-                                        type="text"
-                                        placeholder="Link direto para o PDF ou Drive"
-                                        value={newLesson.materialUrl}
-                                        onChange={(e) => setNewLesson({ ...newLesson, materialUrl: e.target.value })}
-                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
-                                    />
-                                    <input
-                                        type="file"
-                                        accept=".pdf"
-                                        onChange={(e) => handleFileUpload(e, 'pdf')}
-                                        style={{ width: '100%', color: 'var(--text-muted)', fontSize: '0.8rem' }}
-                                    />
-                                </div>
-                                {newLesson.materialUrl?.startsWith('blob:') && <div style={{ fontSize: '0.7rem', color: '#22c55e', marginTop: '0.5rem' }}>✓ PDF LOCAL CARREGADO</div>}
-                            </div>
-
-                            <div style={{ display: 'flex', gap: '1rem' }}>
-                                <button type="button" onClick={() => setShowLessonForm(false)} style={{ flex: 1, padding: '1rem', background: 'transparent', border: '1px solid var(--industrial-border)', color: 'white', cursor: 'pointer', borderRadius: '4px' }}>CANCELAR</button>
-                                <button type="submit" style={{ flex: 2, padding: '1rem', background: 'var(--primary-red)', border: 'none', color: 'white', fontWeight: 900, cursor: 'pointer', borderRadius: '4px' }}>SALVAR LIÇÃO</button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };
