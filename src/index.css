@@ -248,6 +248,13 @@ button {
   margin-bottom: 2rem;
 }
 
+.dash-tab-container {
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid var(--industrial-border);
+}
+
 .dash-title {
   font-size: 1.5rem !important;
   padding-left: 1rem;
@@ -256,6 +263,16 @@ button {
   line-height: 1.2;
   text-transform: uppercase;
   margin: 0;
+}
+
+@media (max-width: 768px) {
+  .dash-tab-container {
+    padding: 1.5rem 1rem !important;
+  }
+  
+  .dash-tab-container h2 {
+    font-size: 1rem !important;
+  }
 }
 
 @media (max-width: 768px) {

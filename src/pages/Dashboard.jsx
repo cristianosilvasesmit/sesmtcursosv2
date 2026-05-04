@@ -343,13 +343,13 @@ const FinanceiroTab = ({ mpConfig, updateMpConfig, transactions }) => {
     };
 
     return (
-        <div style={{ padding: '3rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--industrial-border)' }}>
+        <div className="dash-tab-container">
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
                 <div style={{ fontSize: '2rem' }}>💰</div>
-                <h2 style={{ color: 'white' }}>Configurações de Pagamento</h2>
+                <h2 style={{ color: 'white', fontSize: '1.2rem' }}>Configurações de Pagamento</h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
                 <div className="glass-card" style={{ padding: '2rem' }}>
                     <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between' }}>
                         API MERCADO PAGO
@@ -565,7 +565,7 @@ const LeadsTab = () => {
     if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '2rem' }}>Carregando leads...</div>;
 
     return (
-        <div className="glass-card" style={{ padding: '2rem', border: '1px solid var(--industrial-border)' }}>
+        <div className="dash-tab-container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div style={{ fontSize: '1.5rem' }}>🎯</div>
@@ -654,13 +654,13 @@ const InterfaceTab = ({ themeConfig, updateTheme, changeThemeColor, primaryColor
     };
 
     return (
-        <div style={{ padding: '3rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--industrial-border)' }}>
+        <div className="dash-tab-container">
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
                 <div style={{ fontSize: '2rem' }}>🎨</div>
-                <h2 style={{ color: 'white' }}>Editor Visual do Site (Theme Builder)</h2>
+                <h2 style={{ color: 'white', fontSize: '1.2rem' }}>Editor Visual do Site (Theme Builder)</h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
                 {/* 1. CORES */}
                 <div className="glass-card" style={{ padding: '2rem' }}>
                     <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem' }}>1. COR PRINCIPAL DA MARCA</h4>
