@@ -52,7 +52,7 @@ const CourseEditor = () => {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
-                    {/* Coluna 1: Playlist */}
+                    {/* Lista de Aulas */}
                     <div className="glass-card" style={{ padding: '2rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                             <h2 style={{ fontSize: '1.5rem' }}>PLAYLIST DO CURSO</h2>
@@ -88,16 +88,16 @@ const CourseEditor = () => {
                         )}
                     </div>
 
-                    {/* Coluna 2: Configurações */}
+                    {/* Dados e Configurações */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                         {/* Capa */}
-                        <div className="glass-card" style={{ padding: '2rem' }}>
+                        <div className="glass-card" style={{ padding: '2rem', height: 'fit-content' }}>
                             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>CAPA DO CURSO</h3>
                             <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
                                 <img src={course.image} alt="Capa" style={{ width: '100%', borderRadius: '4px', border: '1px solid var(--industrial-border)' }} />
                                 <label
                                     htmlFor="hero-upload"
-                                    style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'var(--primary-red)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}
+                                    style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'var(--primary-red)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}
                                 >
                                     ALTERAR FOTO
                                 </label>
@@ -125,60 +125,92 @@ const CourseEditor = () => {
                             />
                         </div>
 
-                        {/* Dados Gerais */}
+                        {/* Dados Principais */}
                         <div className="glass-card" style={{ padding: '2rem' }}>
                             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>DADOS GERAIS</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                                 <div>
-                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>TÍTULO</label>
-                                    <input type="text" value={course.title} onChange={(e) => updateCourse(course.id, { title: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontWeight: 700 }} />
+                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>TÍTULO DO CURSO</label>
+                                    <input
+                                        type="text"
+                                        value={course.title}
+                                        onChange={(e) => updateCourse(course.id, { title: e.target.value.toUpperCase() })}
+                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.9rem', fontWeight: 700 }}
+                                    />
                                 </div>
-                                <div>
-                                    <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>PREÇO (R$)</label>
-                                    <input type="text" value={course.price} onChange={(e) => updateCourse(course.id, { price: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontWeight: 700 }} />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>CATEGORIA</label>
+                                        <input
+                                            type="text"
+                                            value={course.category}
+                                            onChange={(e) => updateCourse(course.id, { category: e.target.value })}
+                                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem' }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>PREÇO (R$)</label>
+                                        <input
+                                            type="text"
+                                            value={course.price}
+                                            onChange={(e) => updateCourse(course.id, { price: e.target.value })}
+                                            style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem', fontWeight: 700 }}
+                                        />
+                                    </div>
                                 </div>
                                 <div>
                                     <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 900, marginBottom: '0.4rem' }}>DESCRIÇÃO</label>
-                                    <textarea rows="4" value={course.description} onChange={(e) => updateCourse(course.id, { description: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', resize: 'none' }} />
+                                    <textarea
+                                        rows="4"
+                                        value={course.description}
+                                        onChange={(e) => updateCourse(course.id, { description: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', fontSize: '0.8rem', resize: 'none' }}
+                                    />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Perigo */}
+                        {/* Zona de Perigo */}
                         <div className="glass-card" style={{ padding: '2rem', border: '1px solid rgba(255, 68, 68, 0.3)' }}>
                             <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: '#ff4444' }}>ZONA DE PERIGO</h3>
-                            <button 
+                            <button
                                 onClick={async () => {
-                                    if (window.confirm("⚠️ EXCLUIR ESTE CURSO PERMANENTEMENTE?")) {
+                                    if (window.confirm("⚠️ ATENÇÃO: Você tem certeza que deseja EXCLUIR este curso?")) {
                                         await deleteCourse(course.id);
                                         navigate('/dashboard');
                                     }
                                 }}
                                 style={{ width: '100%', padding: '0.8rem', background: 'rgba(255, 68, 68, 0.1)', color: '#ff4444', border: '1px solid #ff4444', borderRadius: '4px', fontWeight: 900, cursor: 'pointer' }}
                             >
-                                EXCLUIR CURSO
+                                EXCLUIR CURSO PERMANENTEMENTE
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Modal Nova Aula */}
+                {/* Modal de Nova Aula */}
                 {showLessonForm && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-                        <div className="glass-card" style={{ width: '100%', maxWidth: '500px', padding: '2rem' }}>
-                            <h2 style={{ marginBottom: '1.5rem' }}>NOVA AULA</h2>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
+                        <div className="glass-card" style={{ width: '100%', maxWidth: '600px', padding: '3rem' }}>
+                            <h2 style={{ marginBottom: '2rem' }}>NOVA <span style={{ color: 'var(--primary-red)' }}>AULA</span></h2>
                             <form onSubmit={handleAddLesson}>
-                                <input required type="text" placeholder="TÍTULO" value={newLesson.title} onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', marginBottom: '1rem' }} />
-                                <input required type="text" placeholder="ID PANDA VIDEO" value={newLesson.pandaVideoId} onChange={(e) => {
-                                    const val = e.target.value;
-                                    let finalId = val;
-                                    if (val.includes('v=')) finalId = val.match(/v=([a-zA-Z0-9-]+)/)?.[1] || val;
-                                    else if (val.includes('<iframe')) finalId = val.match(/embed\/\?v=([a-zA-Z0-9-]+)/)?.[1] || val;
-                                    setNewLesson({ ...newLesson, pandaVideoId: finalId });
-                                }} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white', marginBottom: '1rem' }} />
-                                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>TÍTULO DA AULA</label>
+                                    <input required type="text" placeholder="Ex: Primeiros Passos" value={newLesson.title} onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white' }} />
+                                </div>
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>ID PANDA VIDEO</label>
+                                    <input required type="text" placeholder="Cole o ID ou Iframe" value={newLesson.pandaVideoId} onChange={(e) => {
+                                        const val = e.target.value;
+                                        let finalId = val;
+                                        if (val.includes('v=')) finalId = val.match(/v=([a-zA-Z0-9-]+)/)?.[1] || val;
+                                        else if (val.includes('<iframe')) finalId = val.match(/embed\/\?v=([a-zA-Z0-9-]+)/)?.[1] || val;
+                                        setNewLesson({ ...newLesson, pandaVideoId: finalId });
+                                    }} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white' }} />
+                                </div>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
                                     <button type="button" onClick={() => setShowLessonForm(false)} style={{ flex: 1, padding: '1rem', background: 'transparent', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }}>CANCELAR</button>
-                                    <button type="submit" style={{ flex: 1, padding: '1rem', background: 'var(--primary-red)', border: 'none', color: 'white', fontWeight: 900, borderRadius: '4px' }}>SALVAR</button>
+                                    <button type="submit" style={{ flex: 2, padding: '1rem', background: 'var(--primary-red)', border: 'none', color: 'white', fontWeight: 900, borderRadius: '4px' }}>SALVAR</button>
                                 </div>
                             </form>
                         </div>
