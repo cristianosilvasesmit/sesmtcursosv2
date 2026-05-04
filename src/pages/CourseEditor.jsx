@@ -35,6 +35,14 @@ const CourseEditor = () => {
         updateCourse(course.id, { lessons: updatedLessons });
     };
 
+    const handleFileUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setNewLesson({ ...newLesson, materialUrl: url });
+        }
+    };
+
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-dark)', paddingTop: '100px', paddingBottom: '100px' }}>
             <div className="container">
@@ -65,7 +73,12 @@ const CourseEditor = () => {
                                     <div key={lesson.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.2rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--industrial-border)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <span style={{ color: 'var(--primary-red)', fontWeight: 900 }}>#{index + 1}</span>
-                                            <div style={{ fontWeight: 700 }}>{lesson.title}</div>
+                                            <div>
+                                                <div style={{ fontWeight: 700 }}>{lesson.title}</div>
+                                                <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>
+                                                    {lesson.pandaVideoId ? '🎥 VÍDEO OK' : '⚠️ SEM VÍDEO'} | {lesson.materialUrl ? '📑 PDF OK' : '⚠️ SEM PDF'}
+                                                </div>
+                                            </div>
                                         </div>
                                         <button onClick={() => handleDeleteLesson(lesson.id)} style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', fontWeight: 700 }}>EXCLUIR</button>
                                     </div>
@@ -80,7 +93,6 @@ const CourseEditor = () => {
 
                     {/* COLUNA 2: CONFIGURAÇÕES */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                        {/* Dados Gerais */}
                         <div className="glass-card" style={{ padding: '2rem' }}>
                             <h3 style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>DADOS DO CURSO</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
@@ -107,19 +119,34 @@ const CourseEditor = () => {
 
                 {/* MODAL NOVA AULA */}
                 {showLessonForm && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
                         <div className="glass-card" style={{ width: '100%', maxWidth: '500px', padding: '2.5rem' }}>
                             <h2 style={{ marginBottom: '1.5rem' }}>NOVA AULA</h2>
                             <form onSubmit={handleAddLesson}>
-                                <input required type="text" placeholder="TÍTULO" value={newLesson.title} onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', marginBottom: '1rem' }} />
-                                <input required type="text" placeholder="ID PANDA VIDEO" value={newLesson.pandaVideoId} onChange={(e) => {
-                                    const val = e.target.value;
-                                    let finalId = val;
-                                    if (val.includes('v=')) finalId = val.match(/v=([a-zA-Z0-9-]+)/)?.[1] || val;
-                                    else if (val.includes('<iframe')) finalId = val.match(/embed\/\?v=([a-zA-Z0-9-]+)/)?.[1] || val;
-                                    setNewLesson({ ...newLesson, pandaVideoId: finalId });
-                                }} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white', marginBottom: '1rem' }} />
-                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>TÍTULO DA AULA</label>
+                                    <input required type="text" placeholder="Ex: Primeiros Passos" value={newLesson.title} onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white' }} />
+                                </div>
+
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>ID DO VÍDEO (PANDA OU YT)</label>
+                                    <input required type="text" placeholder="Cole o ID ou Iframe" value={newLesson.pandaVideoId} onChange={(e) => {
+                                        const val = e.target.value;
+                                        let finalId = val;
+                                        if (val.includes('v=')) finalId = val.match(/v=([a-zA-Z0-9-]+)/)?.[1] || val;
+                                        else if (val.includes('<iframe')) finalId = val.match(/embed\/\?v=([a-zA-Z0-9-]+)/)?.[1] || val;
+                                        setNewLesson({ ...newLesson, pandaVideoId: finalId });
+                                    }} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white' }} />
+                                </div>
+
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-muted)' }}>PDF DE APOIO (OPCIONAL)</label>
+                                    <input type="text" placeholder="URL do PDF" value={newLesson.materialUrl} onChange={(e) => setNewLesson({ ...newLesson, materialUrl: e.target.value })} style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', borderRadius: '4px', color: 'white', marginBottom: '0.5rem' }} />
+                                    <input type="file" accept=".pdf" onChange={handleFileUpload} style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }} />
+                                    {newLesson.materialUrl?.startsWith('blob:') && <div style={{ color: '#22c55e', fontSize: '0.65rem', marginTop: '0.4rem' }}>✓ PDF LOCAL CARREGADO</div>}
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '1rem' }}>
                                     <button type="button" onClick={() => setShowLessonForm(false)} style={{ flex: 1, padding: '1rem', background: 'transparent', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px' }}>CANCELAR</button>
                                     <button type="submit" style={{ flex: 1, padding: '1rem', background: 'var(--primary-red)', border: 'none', color: 'white', fontWeight: 900, borderRadius: '4px' }}>SALVAR</button>
                                 </div>

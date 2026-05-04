@@ -27,3 +27,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Pasta Experimental (Offline)
+src/experimental/
