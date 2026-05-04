@@ -188,6 +188,29 @@ const CourseEditor = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Zona de Perigo */}
+                        <div className="glass-card" style={{ padding: '2rem', border: '1px solid rgba(255, 68, 68, 0.3)' }}>
+                            <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: '#ff4444' }}>ZONA DE PERIGO</h3>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+                                A exclusão do curso é permanente e removerá todas as aulas vinculadas.
+                            </p>
+                            <button 
+                                onClick={async () => {
+                                    if (window.confirm("⚠️ ATENÇÃO: Você tem certeza que deseja EXCLUIR PERMANENTEMENTE este curso e todas as suas aulas? Esta ação não pode ser desfeita.")) {
+                                        await deleteCourse(course.id);
+                                        navigate('/dashboard');
+                                    }
+                                }}
+                                style={{ width: '100%', padding: '0.8rem', background: 'rgba(255, 68, 68, 0.1)', color: '#ff4444', border: '1px solid #ff4444', borderRadius: '4px', fontWeight: 900, cursor: 'pointer', transition: 'all 0.3s' }}
+                                onMouseOver={(e) => e.target.style.background = '#ff4444' }
+                                onMouseOut={(e) => e.target.style.background = 'rgba(255, 68, 68, 0.1)' }
+                                onMouseEnter={(e) => e.target.style.color = 'white'}
+                                onMouseLeave={(e) => e.target.style.color = '#ff4444'}
+                            >
+                                EXCLUIR CURSO PERMANENTEMENTE
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
