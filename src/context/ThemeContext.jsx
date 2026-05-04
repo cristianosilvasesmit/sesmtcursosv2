@@ -14,7 +14,8 @@ export const ThemeProvider = ({ children }) => {
             email: 'cursos@treinamentos.com.br',
             addressLine1: 'Av. Industrial, 1500 - Sala 402',
             addressLine2: 'São Paulo - SP'
-        }
+        },
+        pandaSubdomain: 'player-vz-6b6561d3-c32' // Valor padrão extraído do teste
     };
 
     const [themeConfig, setThemeConfig] = useState(() => {

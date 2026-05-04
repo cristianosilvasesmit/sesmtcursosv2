@@ -731,6 +731,25 @@ const InterfaceTab = ({ themeConfig, updateTheme, changeThemeColor, primaryColor
                         </div>
                     </div>
                 </div>
+
+                {/* 5. PANDA VIDEO CONFIG */}
+                <div className="glass-card" style={{ padding: '2rem', gridColumn: '1 / -1', border: '1px solid var(--primary-red)' }}>
+                    <h4 style={{ color: 'var(--accent-yellow)', marginBottom: '1.5rem' }}>5. INTEGRAÇÕES DE VÍDEO (PANDA VIDEO)</h4>
+                    
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 700 }}>SUBDOMÍNIO DA BIBLIOTECA (EX: player-vz-xxxxxx)</label>
+                        <input 
+                            type="text" 
+                            value={localTheme.pandaSubdomain || ''} 
+                            onChange={(e) => setLocalTheme({...localTheme, pandaSubdomain: e.target.value})} 
+                            placeholder="player-vz-6b6561d3-c32" 
+                            style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--industrial-border)', color: 'white', borderRadius: '4px', fontSize: '1rem', fontWeight: 700 }} 
+                        />
+                        <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.8rem' }}>
+                            ⚠️ Este código é vital para os vídeos rodarem. Se trocar de conta no Panda Video, atualize este campo com o subdomínio que aparece no seu link de embed.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <button onClick={handleSave} style={{ width: '100%', marginTop: '2rem', padding: '1.2rem', background: 'var(--primary-red)', color: 'white', fontWeight: 900, border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1.1rem', boxShadow: '0 4px 15px rgba(255,0,0,0.3)' }}>APLICAR E SALVAR ALTERAÇÕES</button>

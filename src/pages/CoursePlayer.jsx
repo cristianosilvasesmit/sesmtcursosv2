@@ -2,15 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCourses } from '../context/CourseContext';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../lib/supabaseClient';
 
 const CoursePlayer = () => {
     const { id } = useParams();
     const { user } = useAuth();
     const { courses } = useCourses();
+    const { themeConfig } = useTheme();
     const [course, setCourse] = useState(null);
     const [activeLesson, setActiveLesson] = useState(null);
     const [activeTab, setActiveTab] = useState('TÓPICOS DA AULA');
+
+    const pandaSubdomain = themeConfig?.pandaSubdomain || 'player-vz-6b6561d3-c32';
     const [notes, setNotes] = useState({});
     const [completedLessons, setCompletedLessons] = useState([]);
     const notesTimeoutRef = useRef(null);
@@ -100,7 +104,7 @@ const CoursePlayer = () => {
                                 <div style={{ width: '100%', height: '100%', minHeight: '60vh', position: 'relative' }}>
                                     <iframe
                                         id="panda-player"
-                                        src={`https://player-vz-6b6561d3-c32.tv.pandavideo.com.br/embed/?v=${activeLesson.pandaVideoId.includes('v=') ? activeLesson.pandaVideoId.match(/v=([a-zA-Z0-9-]+)/)?.[1] || activeLesson.pandaVideoId : activeLesson.pandaVideoId.includes('<iframe') ? activeLesson.pandaVideoId.match(/embed\/\?v=([a-zA-Z0-9-]+)/)?.[1] || activeLesson.pandaVideoId : activeLesson.pandaVideoId}`}
+                                        src={`https://${pandaSubdomain}.tv.pandavideo.com.br/embed/?v=${activeLesson.pandaVideoId.includes('v=') ? activeLesson.pandaVideoId.match(/v=([a-zA-Z0-9-]+)/)?.[1] || activeLesson.pandaVideoId : activeLesson.pandaVideoId.includes('<iframe') ? activeLesson.pandaVideoId.match(/embed\/\?v=([a-zA-Z0-9-]+)/)?.[1] || activeLesson.pandaVideoId : activeLesson.pandaVideoId}`}
                                         style={{ border: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                                         allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                                         allowFullScreen={true}
