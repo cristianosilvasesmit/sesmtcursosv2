@@ -175,7 +175,22 @@ const CourseEditor = () => {
                                         type="text"
                                         placeholder="Ex: panda-vz-xxxxx-xxxxx"
                                         value={newLesson.pandaVideoId}
-                                        onChange={(e) => setNewLesson({ ...newLesson, pandaVideoId: e.target.value, videoUrl: '' })}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            let finalId = val;
+                                            
+                                            // Se o usuário colou o iframe inteiro ou uma URL, extraímos apenas o ID (v=...)
+                                            if (val.includes('v=')) {
+                                                const match = val.match(/v=([a-zA-Z0-9-]+)/);
+                                                if (match && match[1]) finalId = match[1];
+                                            } else if (val.includes('<iframe')) {
+                                                // Caso cole o iframe mas o regex acima falhe por algum motivo
+                                                const match = val.match(/embed\/\?v=([a-zA-Z0-9-]+)/);
+                                                if (match && match[1]) finalId = match[1];
+                                            }
+
+                                            setNewLesson({ ...newLesson, pandaVideoId: finalId, videoUrl: '' });
+                                        }}
                                         style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--primary-red)', borderRadius: '4px', color: 'white', fontSize: '1.1rem', fontWeight: 900 }}
                                     />
                                     <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>* Obrigatório para aulas em vídeo. O ID é encontrado no painel do Panda Video.</p>
