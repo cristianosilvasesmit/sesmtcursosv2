@@ -100,7 +100,7 @@ const CoursePlayer = () => {
                                 <div style={{ width: '100%', height: '100%', minHeight: '60vh', position: 'relative' }}>
                                     <iframe
                                         id="panda-player"
-                                        src={`https://player-vz-8686d1ba-3430-4e1b-9b16-52c7b5247895.tv.pandavideo.com.br/embed/?v=${activeLesson.pandaVideoId}`}
+                                        src={`https://player-vz-6b6561d3-c32.tv.pandavideo.com.br/embed/?v=${activeLesson.pandaVideoId}`}
                                         style={{ border: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                                         allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                                         allowFullScreen={true}
